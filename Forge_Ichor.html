@@ -1,0 +1,2377 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Forge d’Ichor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Marcellus+SC&display=swap">
+<style>
+/* Disposition : atelier sombre de lapis ; la Forge en deux colonnes (formulaire / fiche + contrôles),
+   les registres en trois volets (tables / lignes / formulaire). L'or marque l'action principale. */
+:root {
+  --fond: #0E1433;
+  --fond-2: #121a40;
+  --panneau: #16204D;
+  --panneau-2: #1C2759;
+  --champ: #0F1738;
+  --filet: #2B3A75;
+  --filet-fort: #40519A;
+  --texte: #ECE6D4;
+  --brume: #A3ACCF;
+  --pale: #737EAA;
+  --or: #E4BB5D;
+  --or-clair: #F5DD9C;
+  --or-fonce: #9C7428;
+  --sur-or: #141a38;
+  --err: #F2907F;
+  --err-fond: rgba(242, 144, 127, .12);
+  --afaire: #E8C46C;
+  --afaire-fond: rgba(232, 196, 108, .11);
+  --info: #93B6F2;
+  --info-fond: rgba(147, 182, 242, .11);
+  --ok: #82D49E;
+  --ok-fond: rgba(130, 212, 158, .11);
+  --bronze: #C68B58;
+  --argent: #C3CCE4;
+  --orm: #E2B94F;
+  --f-titre: 'Marcellus SC', 'Palatino Linotype', Georgia, serif;
+  --f-texte: 'Alegreya Sans', 'Gill Sans', 'Segoe UI', system-ui, sans-serif;
+  --f-code: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  --ombre: 0 10px 30px rgba(0, 0, 0, .35);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --fond: #ECEFF7; --fond-2: #E3E7F2; --panneau: #FFFFFF; --panneau-2: #F4F6FB; --champ: #FFFFFF;
+    --filet: #D3D9EA; --filet-fort: #AEB8D6; --texte: #17204A; --brume: #535E88; --pale: #8A92B3;
+    --or: #946A12; --or-clair: #7A560B; --or-fonce: #946A12; --sur-or: #FFFFFF;
+    --err: #B23D2C; --err-fond: rgba(178, 61, 44, .08); --afaire: #8A6200; --afaire-fond: rgba(196, 140, 0, .1);
+    --info: #2F5DA8; --info-fond: rgba(47, 93, 168, .08); --ok: #2E7D4B; --ok-fond: rgba(46, 125, 75, .09);
+    --bronze: #A0662F; --argent: #6C7896; --orm: #A67A10; --ombre: 0 10px 30px rgba(23, 32, 74, .12);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --fond: #ECEFF7; --fond-2: #E3E7F2; --panneau: #FFFFFF; --panneau-2: #F4F6FB; --champ: #FFFFFF;
+  --filet: #D3D9EA; --filet-fort: #AEB8D6; --texte: #17204A; --brume: #535E88; --pale: #8A92B3;
+  --or: #946A12; --or-clair: #7A560B; --or-fonce: #946A12; --sur-or: #FFFFFF;
+  --err: #B23D2C; --err-fond: rgba(178, 61, 44, .08); --afaire: #8A6200; --afaire-fond: rgba(196, 140, 0, .1);
+  --info: #2F5DA8; --info-fond: rgba(47, 93, 168, .08); --ok: #2E7D4B; --ok-fond: rgba(46, 125, 75, .09);
+  --bronze: #A0662F; --argent: #6C7896; --orm: #A67A10; --ombre: 0 10px 30px rgba(23, 32, 74, .12);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--fond); }
+body { color: var(--texte); font-family: var(--f-texte); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { font-family: var(--f-titre); font-weight: 400; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--or); outline-offset: 2px; }
+.mono, code { font-family: var(--f-code); font-size: .86em; }
+.num { font-variant-numeric: tabular-nums; }
+[hidden] { display: none !important; }
+
+/* ── En-tête ── */
+.entete { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--fond) 88%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid var(--filet); }
+.entete-in { max-width: 1480px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left, 0px)); display: flex; align-items: center; gap: 8px 22px; flex-wrap: wrap; min-height: 56px; }
+.marque { display: flex; align-items: baseline; gap: 10px; }
+.marque b { font-family: var(--f-titre); font-weight: 400; font-size: 22px; letter-spacing: .1em; color: var(--or); }
+.marque span { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--brume); }
+.onglets { display: flex; gap: 2px; flex-wrap: wrap; flex: 1; }
+.onglets button { border: 0; background: none; padding: 16px 12px 14px; cursor: pointer; color: var(--brume); border-bottom: 2px solid transparent; font-size: 15px; }
+.onglets button:hover { color: var(--texte); }
+.onglets button[aria-current="page"] { color: var(--or-clair); border-bottom-color: var(--or); }
+.onglets .compte { font-size: 12px; color: var(--pale); margin-left: 4px; }
+.source { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--filet); background: var(--panneau); cursor: pointer; font-size: 13px; }
+.source i { width: 8px; height: 8px; border-radius: 50%; background: var(--pale); }
+.source.local i { background: var(--info); }
+.source.connecte i { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+.source.deconnecte i { background: var(--err); }
+
+.vue { max-width: 1480px; margin: 0 auto; padding: 20px max(16px, env(safe-area-inset-right, 0px)) 60px max(16px, env(safe-area-inset-left, 0px)); }
+.vue-tete { display: flex; align-items: center; gap: 10px 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.vue-tete h1 { font-size: 26px; color: var(--or-clair); }
+.vue-tete .sous { color: var(--brume); font-size: 14px; }
+.vue-tete .espace { flex: 1; }
+.bandeau { padding: 10px 14px; border-radius: 6px; margin-bottom: 14px; display: flex; gap: 10px 14px; align-items: center; flex-wrap: wrap; border: 1px solid var(--filet); background: var(--panneau); }
+.bandeau.err { border-color: color-mix(in srgb, var(--err) 50%, transparent); background: var(--err-fond); }
+.bandeau.info { border-color: color-mix(in srgb, var(--info) 45%, transparent); background: var(--info-fond); }
+.bandeau.afaire { border-color: color-mix(in srgb, var(--afaire) 45%, transparent); background: var(--afaire-fond); }
+
+/* ── Contrôles de formulaire ── */
+input[type="text"], input[type="search"], input[type="password"], input[type="email"], input[type="number"], select, textarea {
+  background: var(--champ); border: 1px solid var(--filet); border-radius: 5px; padding: 7px 10px; min-height: 36px; width: 100%; min-width: 0;
+}
+textarea { min-height: 70px; resize: vertical; line-height: 1.4; }
+select { cursor: pointer; }
+input:hover, select:hover, textarea:hover { border-color: var(--filet-fort); }
+input:focus, select:focus, textarea:focus { border-color: var(--or); outline: none; box-shadow: 0 0 0 2px color-mix(in srgb, var(--or) 25%, transparent); }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--or); width: 16px; height: 16px; margin: 0; }
+input[type="color"] { width: 42px; height: 36px; padding: 2px; border: 1px solid var(--filet); border-radius: 5px; background: var(--champ); cursor: pointer; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 6px 14px; border-radius: 5px; border: 1px solid var(--filet-fort); background: var(--panneau-2); cursor: pointer; font-weight: 500; white-space: nowrap; }
+.btn:hover:not(:disabled) { border-color: var(--or); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.prim { background: linear-gradient(180deg, var(--or-clair), var(--or)); border-color: var(--or-fonce); color: var(--sur-or); font-weight: 700; }
+:root[data-theme="light"] .btn.prim { background: var(--or); }
+.btn.prim:hover:not(:disabled) { filter: brightness(1.06); }
+.btn.danger { color: var(--err); border-color: color-mix(in srgb, var(--err) 55%, transparent); background: transparent; }
+.btn.danger.arme { background: var(--err); color: var(--sur-or); }
+.btn.discret { background: transparent; border-color: transparent; color: var(--brume); }
+.btn.discret:hover:not(:disabled) { color: var(--texte); border-color: var(--filet); }
+.btn svg, .ic svg { width: 16px; height: 16px; flex: none; }
+.ic { width: 34px; height: 34px; display: inline-grid; place-items: center; border-radius: 5px; border: 1px solid var(--filet); background: var(--panneau-2); cursor: pointer; color: var(--brume); flex: none; }
+.ic:hover { color: var(--texte); border-color: var(--filet-fort); }
+.ic.actif { color: var(--sur-or); background: var(--or); border-color: var(--or-fonce); }
+.outils { display: inline-flex; gap: 4px; }
+
+/* ── Forge ── */
+.forge { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 1100px) { .forge { grid-template-columns: minmax(0, 1fr); } }
+.forge-form { display: grid; gap: 14px; min-width: 0; }
+.forge-cote { display: grid; gap: 14px; min-width: 0; position: sticky; top: 72px; max-height: calc(100vh - 84px); overflow: auto; padding-right: 2px; }
+@media (max-width: 1100px) { .forge-cote { position: static; max-height: none; overflow: visible; } }
+.barre-forge { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; padding: 12px 14px; border-radius: 8px; background: var(--panneau); border: 1px solid var(--filet); }
+.barre-forge h1 { font-size: 22px; color: var(--or-clair); }
+.barre-forge .id { font-family: var(--f-code); font-size: 13px; color: var(--brume); }
+.barre-forge .modifie { font-size: 13px; color: var(--afaire); display: inline-flex; align-items: center; gap: 6px; }
+.barre-forge .modifie::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--afaire); }
+.barre-forge .espace { flex: 1; }
+.bloc { padding: 14px 16px 16px; border-radius: 8px; background: var(--panneau); border: 1px solid var(--filet); display: grid; gap: 12px; }
+.bloc-tete { display: flex; align-items: baseline; gap: 8px 12px; flex-wrap: wrap; }
+.bloc-tete h2 { font-size: 17px; color: var(--texte); }
+.bloc-tete .aide { font-size: 13px; color: var(--brume); }
+.bloc-tete .espace { flex: 1; }
+.rangee { display: grid; grid-template-columns: 110px minmax(0, 1fr) auto; gap: 8px 10px; align-items: center; }
+.rangee > label, .rangee > .lib { font-size: 13px; color: var(--brume); }
+@media (max-width: 560px) { .rangee { grid-template-columns: minmax(0, 1fr) auto; } .rangee > label, .rangee > .lib { grid-column: 1 / -1; } }
+.sous-ligne { grid-column: 2 / -1; font-size: 13px; color: var(--brume); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; margin-top: -2px; }
+@media (max-width: 560px) { .sous-ligne { grid-column: 1 / -1; } }
+.sous-ligne .note { color: var(--afaire); }
+.deux { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 560px) { .deux { grid-template-columns: minmax(0, 1fr); } }
+.champ { display: grid; gap: 4px; min-width: 0; }
+.champ > span { font-size: 13px; color: var(--brume); }
+
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { border: 1px solid var(--filet); background: var(--champ); border-radius: 5px; padding: 6px 12px; cursor: pointer; min-height: 36px; }
+.seg button[aria-pressed="true"] { border-color: var(--or); background: color-mix(in srgb, var(--or) 14%, var(--champ)); }
+.seg.petit button { padding: 3px 10px; min-height: 30px; font-size: 13px; }
+
+.elev { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; white-space: nowrap; }
+.elev .pips { font-size: 10px; letter-spacing: 1px; color: var(--bronze); }
+.elev.e2 .pips { color: var(--argent); }
+.elev.e3 .pips { color: var(--orm); }
+.elev.e4 .pips { background: linear-gradient(90deg, #F6CF4F, #F2A9C9, #8FD3E8); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+.puce { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; font-size: 13px; border: 1px solid color-mix(in srgb, var(--c, var(--brume)) 50%, transparent); background: color-mix(in srgb, var(--c, var(--brume)) 12%, transparent); white-space: nowrap; }
+.puce::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--c, var(--brume)); }
+.puce.sans::before { display: none; }
+.puces { display: flex; flex-wrap: wrap; gap: 5px; }
+
+.slot { display: grid; grid-template-columns: 130px minmax(0, 1fr) auto auto; gap: 8px 10px; align-items: center; }
+@media (max-width: 640px) { .slot { grid-template-columns: minmax(0, 1fr) auto; } .slot .slot-elev { grid-column: 1 / -1; } .slot .bascule { grid-column: 1 / 2; } }
+.bascule { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--brume); cursor: pointer; white-space: nowrap; }
+
+.stats-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.stat-champ { display: grid; gap: 3px; }
+.stat-champ span { font-size: 12px; color: var(--brume); display: flex; justify-content: space-between; gap: 6px; }
+.stat-champ span b { color: var(--texte); font-weight: 700; letter-spacing: .04em; }
+.stat-champ input { text-align: right; font-variant-numeric: tabular-nums; }
+.stat-champ.alerte input { border-color: var(--afaire); }
+
+.ajout-nom { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) auto; gap: 8px; padding: 10px; border-radius: 6px; background: var(--fond-2); border: 1px dashed var(--filet-fort); }
+@media (max-width: 640px) { .ajout-nom { grid-template-columns: minmax(0, 1fr); } }
+
+/* Fiche */
+.fiche { --pc: var(--or); padding: 18px; border-radius: 8px; border: 1px solid color-mix(in srgb, var(--pc) 45%, var(--filet)); background: linear-gradient(160deg, color-mix(in srgb, var(--pc) 13%, var(--panneau)), var(--panneau) 55%); display: grid; gap: 10px; }
+.fiche-sur { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; font-size: 13px; color: var(--brume); }
+.fiche h2 { font-size: 30px; line-height: 1.05; }
+.fiche h2.sans { color: var(--pale); }
+.fiche-enfant { font-size: 16px; }
+.fiche-enfant span { color: var(--brume); font-size: 14px; margin-left: 6px; }
+.fiche dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 12px; margin: 0; font-size: 14px; }
+.fiche dt { color: var(--brume); }
+.fiche dd { margin: 0; }
+.fiche-pouvoirs { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.fiche-pouvoirs li { padding: 8px 10px 9px; border-radius: 6px; background: color-mix(in srgb, var(--fond) 55%, transparent); border-left: 3px solid var(--c, var(--filet)); display: grid; gap: 2px; }
+.fiche-pouvoirs .emp { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--brume); }
+.fiche-pouvoirs b { font-family: var(--f-titre); font-weight: 400; font-size: 16px; }
+.fiche-pouvoirs .meta { font-size: 13px; color: var(--brume); }
+.fiche-pouvoirs p { font-size: 13.5px; }
+.fiche-pouvoirs .vide { color: var(--pale); font-style: italic; }
+
+/* Messages de contrôle */
+.panneau { padding: 14px 16px; border-radius: 8px; background: var(--panneau); border: 1px solid var(--filet); display: grid; gap: 10px; }
+.panneau > h3 { font-size: 16px; display: flex; align-items: baseline; gap: 10px; }
+.panneau > h3 small { font-family: var(--f-texte); font-size: 13px; color: var(--brume); }
+.msgs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.msgs li { padding: 7px 10px 7px 12px; border-radius: 5px; font-size: 14px; border-left: 3px solid; }
+.msgs li.erreur { background: var(--err-fond); border-color: var(--err); }
+.msgs li.afaire { background: var(--afaire-fond); border-color: var(--afaire); }
+.msgs li.alerte { background: var(--info-fond); border-color: var(--info); }
+.msgs li.ok { background: var(--ok-fond); border-color: var(--ok); }
+
+.comp { display: grid; gap: 9px; }
+.comp-l { display: grid; grid-template-columns: 70px minmax(0, 1fr) 70px; gap: 10px; align-items: center; font-size: 13px; }
+.comp-l .v { text-align: right; font-variant-numeric: tabular-nums; }
+.comp-barre { position: relative; height: 18px; }
+.comp-barre .plage { position: absolute; top: 7px; height: 4px; border-radius: 2px; background: var(--filet-fort); }
+.comp-barre .med { position: absolute; top: 3px; width: 2px; height: 12px; background: var(--brume); }
+.comp-barre .moi { position: absolute; top: 2px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--or); border: 2px solid var(--panneau); }
+.legende-comp { font-size: 12px; color: var(--brume); display: flex; gap: 14px; flex-wrap: wrap; }
+.legende-comp i { display: inline-block; vertical-align: middle; margin-right: 5px; }
+
+/* ── Tableaux ── */
+.tab-wrap { overflow-x: auto; border: 1px solid var(--filet); border-radius: 8px; background: var(--panneau); }
+.tab { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 760px; }
+.tab th, .tab td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--filet); vertical-align: middle; }
+.tab th { font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--brume); background: var(--panneau-2); position: sticky; top: 0; }
+.tab tbody tr:hover { background: color-mix(in srgb, var(--or) 5%, transparent); }
+.tab tbody tr:last-child td { border-bottom: 0; }
+.tab .lien { border: 0; background: none; padding: 0; cursor: pointer; font-weight: 700; text-align: left; color: var(--texte); }
+.tab .lien:hover { color: var(--or-clair); text-decoration: underline; }
+.pill { display: inline-block; padding: 1px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .03em; border: 1px solid; }
+.pill.brouillon { color: var(--brume); border-color: var(--filet-fort); }
+.pill.valide { color: var(--info); border-color: color-mix(in srgb, var(--info) 55%, transparent); }
+.pill.en_jeu { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 55%, transparent); background: var(--ok-fond); }
+.pill.retire { color: var(--pale); border-color: var(--filet); text-decoration: line-through; }
+.marque-ctrl { display: inline-flex; gap: 6px; font-size: 13px; }
+.marque-ctrl .e { color: var(--err); }
+.marque-ctrl .a { color: var(--afaire); }
+.filtres { display: grid; grid-template-columns: minmax(180px, 2fr) repeat(4, minmax(120px, 1fr)); gap: 8px; margin-bottom: 12px; }
+@media (max-width: 900px) { .filtres { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ── Listes ── */
+.listes { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 900px) { .listes { grid-template-columns: minmax(0, 1fr); } }
+.listes-nav { display: grid; gap: 14px; position: sticky; top: 72px; }
+@media (max-width: 900px) { .listes-nav { position: static; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } }
+.listes-nav h3 { font-family: var(--f-texte); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--pale); margin-bottom: 4px; }
+.listes-nav button { display: flex; justify-content: space-between; gap: 8px; width: 100%; border: 0; background: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; text-align: left; color: var(--brume); }
+.listes-nav button:hover { background: var(--panneau); color: var(--texte); }
+.listes-nav button[aria-current="true"] { background: var(--panneau-2); color: var(--or-clair); }
+.listes-nav button span { font-size: 12px; color: var(--pale); font-variant-numeric: tabular-nums; }
+.listes-corps { display: grid; grid-template-columns: minmax(240px, 1fr) minmax(0, 1.5fr); gap: 16px; align-items: start; }
+@media (max-width: 1150px) { .listes-corps { grid-template-columns: minmax(0, 1fr); } }
+.lignes { display: grid; gap: 2px; max-height: calc(100vh - 190px); overflow: auto; padding: 4px; border: 1px solid var(--filet); border-radius: 8px; background: var(--panneau); }
+@media (max-width: 1150px) { .lignes { max-height: 360px; } }
+.lignes button { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; width: 100%; border: 0; background: none; padding: 7px 10px; border-radius: 5px; cursor: pointer; text-align: left; }
+.lignes button:hover { background: var(--panneau-2); }
+.lignes button[aria-current="true"] { background: color-mix(in srgb, var(--or) 14%, var(--panneau)); }
+.lignes .l1 { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lignes .l2 { font-size: 12px; color: var(--brume); grid-column: 1 / -1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lignes .idm { font-family: var(--f-code); font-size: 12px; color: var(--pale); }
+.lignes .en { width: 7px; height: 7px; border-radius: 50%; background: var(--afaire); display: inline-block; margin-left: 6px; vertical-align: middle; }
+.lignes .rien { padding: 16px; color: var(--brume); font-size: 14px; }
+.formulaire { display: grid; gap: 12px; padding: 16px; border-radius: 8px; background: var(--panneau); border: 1px solid var(--filet); }
+.formulaire-tete { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.formulaire-tete h2 { font-size: 20px; color: var(--or-clair); }
+.formulaire-tete .mono { color: var(--brume); }
+.grille-champs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
+@media (max-width: 640px) { .grille-champs { grid-template-columns: minmax(0, 1fr); } }
+.grille-champs .large { grid-column: 1 / -1; }
+.champ .ro { padding: 7px 10px; border-radius: 5px; border: 1px dashed var(--filet); color: var(--brume); font-family: var(--f-code); font-size: 13px; min-height: 36px; display: flex; align-items: center; }
+.coche { display: flex; align-items: center; gap: 8px; min-height: 36px; cursor: pointer; }
+.choix-multi { display: flex; flex-wrap: wrap; gap: 6px; }
+.choix-multi button { border: 1px solid var(--filet); background: var(--champ); border-radius: 999px; padding: 3px 11px; cursor: pointer; font-size: 13px; }
+.choix-multi button[aria-pressed="true"] { border-color: var(--c, var(--or)); background: color-mix(in srgb, var(--c, var(--or)) 18%, var(--champ)); }
+.pivot { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.pivot label { display: grid; gap: 3px; font-size: 12px; color: var(--brume); }
+.apercu { padding: 8px 12px; border-radius: 5px; background: var(--fond-2); font-size: 14px; }
+.sous-liste { display: grid; gap: 6px; }
+.sous-liste h3 { font-family: var(--f-texte); font-size: 13px; font-weight: 700; color: var(--brume); letter-spacing: .06em; text-transform: uppercase; }
+.sous-liste ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
+.sous-liste li button { border: 0; background: var(--fond-2); border-radius: 5px; padding: 6px 10px; cursor: pointer; width: 100%; text-align: left; display: flex; justify-content: space-between; gap: 10px; }
+.sous-liste li button:hover { background: var(--panneau-2); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.actions .espace { flex: 1; }
+.vide-etat { padding: 28px 20px; border-radius: 8px; border: 1px dashed var(--filet-fort); color: var(--brume); display: grid; gap: 10px; justify-items: start; }
+.vide-etat h2 { font-size: 19px; color: var(--texte); }
+
+/* ── Échanges, contrôles, réglages ── */
+.cartes { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; align-items: start; }
+.depot { border: 2px dashed var(--filet-fort); border-radius: 8px; padding: 22px; text-align: center; color: var(--brume); display: grid; gap: 10px; justify-items: center; }
+.depot.survol { border-color: var(--or); background: color-mix(in srgb, var(--or) 7%, transparent); }
+.fichiers { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.fichiers li { display: grid; grid-template-columns: minmax(0, 1fr) 190px auto; gap: 8px; align-items: center; font-size: 14px; }
+.rapport { display: grid; gap: 8px; }
+.rapport-l { padding: 10px 12px; border-radius: 6px; background: var(--fond-2); display: grid; gap: 6px; }
+.rapport-l .chiffres { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; color: var(--brume); }
+.rapport-l .chiffres b { color: var(--texte); }
+.export-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; }
+.export-grille button { justify-content: space-between; }
+.liste-ctrl { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.liste-ctrl li { display: flex; gap: 8px 12px; align-items: baseline; flex-wrap: wrap; font-size: 14px; padding: 6px 0; border-bottom: 1px solid var(--filet); }
+.liste-ctrl li:last-child { border-bottom: 0; }
+.liste-ctrl .lien { border: 0; background: none; padding: 0; cursor: pointer; color: var(--or-clair); font-weight: 700; }
+.liste-ctrl .lien:hover { text-decoration: underline; }
+.liste-ctrl small { color: var(--brume); }
+.radios { display: grid; gap: 8px; }
+.radios label { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--filet); cursor: pointer; }
+.radios label:has(input:checked) { border-color: var(--or); background: color-mix(in srgb, var(--or) 8%, transparent); }
+.radios small { display: block; color: var(--brume); font-size: 13px; }
+.mono-bloc { font-family: var(--f-code); font-size: 12.5px; padding: 10px 12px; border-radius: 5px; background: var(--fond-2); overflow-x: auto; white-space: pre; }
+
+/* ── Notifications ── */
+.toasts { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: max(16px, env(safe-area-inset-bottom, 0px)); display: grid; gap: 8px; z-index: 50; max-width: min(420px, calc(100vw - 32px)); }
+.toast { padding: 10px 14px; border-radius: 6px; background: var(--panneau-2); border: 1px solid var(--filet-fort); box-shadow: var(--ombre); font-size: 14px; border-left: 4px solid var(--ok); }
+.toast.erreur { border-left-color: var(--err); }
+.toast.info { border-left-color: var(--info); }
+.voile { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; background: color-mix(in srgb, var(--fond) 70%, transparent); }
+.voile div { padding: 16px 22px; border-radius: 8px; background: var(--panneau); border: 1px solid var(--filet-fort); box-shadow: var(--ombre); }
+@media (prefers-reduced-motion: no-preference) { .toast { animation: entree .2s ease-out; } @keyframes entree { from { opacity: 0; transform: translateY(6px); } } }
+
+</style>
+</head>
+<body>
+<header class="entete">
+  <div class="entete-in">
+    <div class="marque"><b>Forge</b><span>Héritiers d’Ichor</span></div>
+    <nav class="onglets" id="onglets" aria-label="Sections"></nav>
+    <button class="source" id="source" data-a="aller" data-v="reglages" title="Source des données"></button>
+  </div>
+</header>
+<main class="vue" id="vue"></main>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<div class="voile" id="voile" hidden></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+'use strict';
+/* ═══════════════════════════════════════════════════════════════
+   Forge d’Ichor · couche de données
+   Métadonnées des registres, validations (miroir de schema.sql),
+   base locale, adaptateur Supabase, échanges TSV et build JSON.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Utilitaires ── */
+const vide = v => v === null || v === undefined || v === '';
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const nombreFr = v => (vide(v) ? '' : String(v).replace('.', ','));
+function lireNombre(s) {
+  if (vide(s)) return null;
+  if (typeof s === 'number') return s;
+  const t = String(s).trim().replace(/[\s  ]/g, '').replace(',', '.');
+  if (t === '') return null;
+  const n = Number(t);
+  return Number.isFinite(n) ? n : NaN;
+}
+function lireBool(s) {
+  if (typeof s === 'boolean') return s;
+  const v = String(s ?? '').trim().toLowerCase();
+  if (['oui', 'vrai', 'true', '1', 'yes', 'x'].includes(v)) return true;
+  if (['non', 'faux', 'false', '0', 'no', ''].includes(v)) return false;
+  return null;
+}
+const piocher = a => (a && a.length ? a[Math.floor(Math.random() * a.length)] : null);
+const copie = o => (o == null ? o : JSON.parse(JSON.stringify(o)));
+const maintenant = () => new Date().toISOString();
+const arrondi = v => (Math.abs(v) >= 100 ? Math.round(v) : Math.round(v * 100) / 100);
+
+class ErreurForge extends Error {
+  constructor(messages) {
+    const l = Array.isArray(messages) ? messages : [messages];
+    super(l.join(' '));
+    this.messages = l;
+  }
+}
+
+/* ── Colonnes ── */
+const C = {
+  slug: () => ({ n: 'id', l: 'Identifiant', t: 'slug', req: true }),
+  auto: (prefixe, chiffres) => ({ n: 'id', l: 'Identifiant', t: 'auto', prefixe, chiffres }),
+  txt: (n, l, o = {}) => ({ n, l, t: 'texte', ...o }),
+  long: (n, l, o = {}) => ({ n, l, t: 'long', ...o }),
+  int: (n, l, o = {}) => ({ n, l, t: 'entier', ...o }),
+  num: (n, l, o = {}) => ({ n, l, t: 'nombre', ...o }),
+  bool: (n, l, o = {}) => ({ n, l, t: 'bool', def: false, ...o }),
+  enu: (n, l, vals, o = {}) => ({ n, l, t: 'enum', vals, ...o }),
+  ref: (n, l, table, o = {}) => ({ n, l, t: 'ref', table, ...o }),
+  couleur: () => ({ n: 'couleur', l: 'Couleur', t: 'couleur' }),
+  liste: (n, l, table, j) => ({ n, l, t: 'liste', table, virt: true, ...j }),
+  pivot: (n, l, table, j) => ({ n, l, t: 'pivot', table, virt: true, ...j }),
+  poly: (n, l, choix, o = {}) => ({ n, l, t: 'poly', choix, virt: !o.reel, ...o }),
+};
+const NOMS = [C.txt('nom_fr', 'Nom (FR)', { req: true }), C.txt('nom_en', 'Nom (EN)', { en: true })];
+const DESC = [C.long('description_fr', 'Description (FR)'), C.long('description_en', 'Description (EN)', { en: true })];
+
+const LS_ENTITE = { t: 'liste', jonction: 'entite_spheres', fk: 'entite_id', vers: 'sphere_id' };
+const LS_ORIGINE = { t: 'liste', jonction: 'origine_pantheons', fk: 'origine_id', vers: 'pantheon_id' };
+const PV_VOCATION = { t: 'pivot', jonction: 'vocation_profils', fk: 'vocation_id', vers: 'stat_id', val: 'poids' };
+
+const SOURCES_MODIF = {
+  vocation: { col: 'vocation_id', table: 'vocations', l: 'Vocation' },
+  sphere: { col: 'sphere_id', table: 'spheres', l: 'Sphère' },
+  elevation: { col: 'elevation_id', table: 'elevations', l: 'Élévation' },
+  type: { col: 'type_id', table: 'types_heritage', l: 'Type d’héritage' },
+  pouvoir: { col: 'pouvoir_id', table: 'pouvoirs', l: 'Passif', filtre: r => r.emplacement === 'passif', refus: 'seul un passif peut être une source.' },
+  palier: { col: 'palier_id', table: 'synergie_paliers', l: 'Palier de synergie' },
+};
+
+/* ── Registres ── */
+const META = {
+  elevations: {
+    titre: 'Élévations', dom: 'Héritage', tri: (a, b) => a.ordre - b.ordre,
+    cols: [C.slug(), ...NOMS, C.int('ordre', 'Ordre', { req: true, min: 1 }), C.int('nb_spheres', 'Sphères débloquées (cumul)', { req: true, min: 1 }),
+      C.int('spheres_libres', 'Sphères libres, choisies en jeu', { req: true, min: 0, def: 0 }), C.num('ip_cible', 'IP cible'),
+      C.num('tolerance_ip', 'Tolérance IP', { min: 0 }), C.num('taux_invocation', 'Taux d’invocation (0 à 1)', { min: 0, max: 1 }),
+      C.int('fragments_requis', 'Fragments requis', { min: 0 }), ...DESC],
+    uniques: [['ordre']],
+  },
+  ecarts_elevation: {
+    titre: 'Écarts d’élévation', dom: 'Héritage',
+    cols: [C.ref('depart_id', 'Élévation de départ', 'elevations', { req: true }), C.ref('atteinte_id', 'Élévation atteinte', 'elevations', { req: true }),
+      C.num('coefficient', 'Coefficient', { req: true, min: 0, minExcl: true, def: 1 })],
+    lib: (r, B) => `${libId(B, 'elevations', r.depart_id)} → ${libId(B, 'elevations', r.atteinte_id)}`,
+    tri: (a, b, B) => (ordreElev(B, a.depart_id) - ordreElev(B, b.depart_id)) || (ordreElev(B, a.atteinte_id) - ordreElev(B, b.atteinte_id)),
+    verif: (E, B) => {
+      const a = B.get('elevations', E.depart_id), b = B.get('elevations', E.atteinte_id);
+      return a && b && b.ordre < a.ordre ? ['L’élévation atteinte précède l’élévation de départ.'] : [];
+    },
+  },
+  pantheons: { titre: 'Panthéons', dom: 'Héritage', cols: [C.slug(), ...NOMS, C.couleur(), ...DESC] },
+  types_heritage: { titre: 'Types d’héritage', dom: 'Héritage', cols: [C.slug(), ...NOMS, ...DESC] },
+  entites: {
+    titre: 'Entités parentes', dom: 'Héritage',
+    cols: [C.auto('ENT-', 4), ...NOMS,
+      C.enu('genre', 'Genre', [['M', 'Masculin'], ['F', 'Féminin'], ['N', 'Neutre']], { req: true }),
+      C.enu('determinant_fr', 'Déterminant (FR)', [['aucun', 'aucun'], ['le', 'le'], ['la', 'la'], ['l', 'l’'], ['les', 'les']], { req: true, def: 'aucun' }),
+      C.bool('elision_fr', 'Élision (FR) : « d’… »'),
+      C.enu('article_en', 'Article (EN)', [['aucun', 'aucun'], ['the', 'the']], { req: true, def: 'aucun' }),
+      C.txt('forme_de_fr', 'Surcharge de « de … » (FR)'), C.txt('forme_de_en', 'Surcharge de « of … » (EN)'),
+      C.ref('pantheon_id', 'Panthéon', 'pantheons', { req: true }), C.ref('type_id', 'Type', 'types_heritage', { req: true }),
+      C.liste('spheres', 'Sphères héritables', 'spheres', { jonction: 'entite_spheres', fk: 'entite_id', vers: 'sphere_id' }), ...DESC],
+    uniques: [['nom_fr', 'pantheon_id']],
+    apercu: E => `${enfantDeFr(E)} · ${enfantDeEn(E)}`,
+    calc: (r) => ({ calc_enfant_de_fr: enfantDeFr(r), calc_enfant_de_en: enfantDeEn(r) }),
+  },
+  origines: {
+    titre: 'Origines des noms', dom: 'Héritage',
+    cols: [C.slug(), ...NOMS, C.bool('universelle', 'Universelle (acceptée par tous les panthéons)'),
+      C.liste('pantheons', 'Panthéons qui l’acceptent', 'pantheons', { jonction: 'origine_pantheons', fk: 'origine_id', vers: 'pantheon_id' })],
+  },
+  noms: {
+    titre: 'Noms', dom: 'Héritage',
+    cols: [C.auto('NOM-', 5), C.txt('nom', 'Nom', { req: true }), C.txt('nom_en', 'Nom (EN), si différent'),
+      C.ref('origine_id', 'Origine', 'origines', { req: true }),
+      C.enu('genre', 'Genre', [['M', 'Masculin'], ['F', 'Féminin'], ['E', 'Épicène']], { req: true })],
+    uniques: [['nom', 'origine_id']],
+    lib: r => r.nom,
+    tri: (a, b) => a.nom.localeCompare(b.nom, 'fr'),
+  },
+  spheres: { titre: 'Sphères', dom: 'Héritage', cols: [C.slug(), ...NOMS, C.couleur(), ...DESC] },
+  vocations: {
+    titre: 'Vocations', dom: 'Héritage',
+    cols: [C.slug(), ...NOMS, ...DESC,
+      C.pivot('profil', 'Profil de stats (bouton Auto)', 'stats', { jonction: 'vocation_profils', fk: 'vocation_id', vers: 'stat_id', val: 'poids', min: 0 })],
+  },
+  stats: {
+    titre: 'Statistiques', dom: 'Héritage', tri: (a, b) => (a.ordre ?? 99) - (b.ordre ?? 99),
+    cols: [C.slug(), ...NOMS, C.txt('abreviation_fr', 'Abréviation (FR)'), C.txt('abreviation_en', 'Abréviation (EN)', { en: true }),
+      C.txt('unite', 'Unité'), C.num('valeur_ref', 'Valeur de référence'), C.num('min', 'Minimum'), C.num('max', 'Maximum'),
+      C.num('poids_ip', 'Poids dans l’IP'), C.int('ordre', 'Ordre')],
+    verif: E => (!vide(E.min) && !vide(E.max) && E.min > E.max ? ['Le minimum dépasse le maximum.'] : []),
+  },
+  ciblages: {
+    titre: 'Ciblages', dom: 'Héritage',
+    cols: [C.slug(), ...NOMS, C.enu('camp', 'Camp', [['ennemi', 'Ennemi'], ['allie', 'Allié'], ['soi', 'Soi']], { req: true }),
+      C.txt('regle', 'Règle (code)'), ...DESC],
+  },
+  pouvoirs: {
+    titre: 'Pouvoirs', dom: 'Pouvoirs',
+    cols: [C.auto('POU-', 4), ...NOMS,
+      C.enu('emplacement', 'Emplacement', [['passif', 'Passif'], ['pouvoir', 'Pouvoir'], ['ultime', 'Ultime']], { req: true, fige: true }),
+      C.ref('sphere_id', 'Sphère', 'spheres', { req: true }),
+      C.ref('declencheur_id', 'Déclencheur', 'declencheurs', { si: E => E.emplacement === 'passif' }),
+      C.num('declencheur_valeur', 'Valeur du déclencheur', { si: E => E.emplacement === 'passif' }),
+      C.num('recharge_s', 'Recharge (s)', { min: 0, minExcl: true, si: E => E.emplacement === 'pouvoir' }),
+      C.num('energie_requise', 'Énergie requise', { min: 0, minExcl: true, si: E => E.emplacement === 'ultime' }),
+      C.long('texte_modele_fr', 'Texte (FR)'), C.long('texte_modele_en', 'Texte (EN)', { en: true }),
+      C.enu('statut', 'Statut', [['brouillon', 'Brouillon'], ['valide', 'Validé']], { req: true, def: 'brouillon' })],
+    prefixe: E => ({ passif: 'PAS-', pouvoir: 'POU-', ultime: 'ULT-' }[E.emplacement] || 'POU-'),
+    enfants: [{ table: 'effets', fk: 'pouvoir_id', titre: 'Effets' }],
+    verif: E => {
+      const e = [];
+      if (E.emplacement === 'passif' && vide(E.declencheur_id)) e.push('Un passif a besoin d’un déclencheur.');
+      if (E.emplacement === 'pouvoir' && vide(E.recharge_s)) e.push('Un pouvoir a besoin d’un temps de recharge.');
+      if (E.emplacement === 'ultime' && vide(E.energie_requise)) e.push('Un ultime a besoin d’une énergie requise.');
+      return e;
+    },
+    lib: r => r.nom_fr,
+  },
+  effets: {
+    titre: 'Effets', dom: 'Pouvoirs',
+    cols: [C.auto('EFF-', 5), C.ref('pouvoir_id', 'Pouvoir', 'pouvoirs', { req: true }), C.int('ordre', 'Ordre', { req: true, min: 1 }),
+      C.ref('type_effet_id', 'Type d’effet', 'types_effet', { req: true }), C.ref('ciblage_id', 'Ciblage (vide : ciblage favori)', 'ciblages'),
+      C.txt('condition', 'Condition'),
+      C.liste('etiquettes', 'Étiquettes', 'etiquettes', { jonction: 'effet_etiquettes', fk: 'effet_id', vers: 'etiquette_id' }),
+      C.pivot('p', 'Paramètres', 'parametres_effet', { jonction: 'effet_parametres', fk: 'effet_id', vers: 'parametre_id', val: 'valeur' })],
+    uniques: [['pouvoir_id', 'ordre']],
+    lib: (r, B) => `${libId(B, 'pouvoirs', r.pouvoir_id)} · effet ${r.ordre}`,
+    tri: (a, b) => (a.pouvoir_id || '').localeCompare(b.pouvoir_id || '') || a.ordre - b.ordre,
+  },
+  declencheurs: { titre: 'Déclencheurs', dom: 'Pouvoirs', cols: [C.slug(), ...NOMS, C.txt('unite_valeur', 'Unité de la valeur'), ...DESC] },
+  types_effet: { titre: 'Types d’effet', dom: 'Pouvoirs', cols: [C.slug(), ...NOMS, ...DESC] },
+  parametres_effet: { titre: 'Paramètres d’effet', dom: 'Pouvoirs', cols: [C.slug(), ...NOMS, C.txt('unite', 'Unité'), ...DESC] },
+  etiquettes: { titre: 'Étiquettes', dom: 'Pouvoirs', cols: [C.slug(), ...NOMS, ...DESC] },
+  modificateurs: {
+    titre: 'Modificateurs', dom: 'Modificateurs',
+    cols: [C.auto('MOD-', 4),
+      C.poly('source', 'Source', SOURCES_MODIF, { req: true, tsvType: 'source_type', tsvId: 'source_id' }),
+      C.poly('cible', 'Cible', { stat: { col: 'stat_id', table: 'stats', l: 'Stat' }, parametre: { col: 'parametre_id', table: 'parametres_effet', l: 'Paramètre d’effet' } },
+        { req: true, tsvType: 'cible_type', tsvId: 'cible_id' }),
+      C.ref('etiquette_id', 'Filtre par étiquette', 'etiquettes', { si: E => (E.cible || {}).type === 'parametre' }),
+      C.enu('portee', 'Portée', [['heritier', 'Héritier'], ['sphere', 'Pouvoirs de la sphère source'], ['equipe', 'Équipe']], { req: true, def: 'heritier' }),
+      C.enu('operation', 'Opération', [['ajout', 'Ajout'], ['multiplication', 'Multiplication'], ['remplacement', 'Remplacement']], { req: true }),
+      C.num('valeur', 'Valeur', { req: true }), C.txt('condition', 'Condition'), ...DESC],
+    verif: E => (E.portee === 'sphere' && (E.source || {}).type !== 'sphere' ? ['La portée « sphère » demande une sphère comme source.'] : []),
+    lib: (r, B) => {
+      const E = versEdition(B, 'modificateurs', r);
+      const s = E.source.type ? libId(B, SOURCES_MODIF[E.source.type].table, E.source.id) : '?';
+      const c = E.cible.type === 'stat' ? libId(B, 'stats', E.cible.id) : E.cible.type === 'parametre' ? libId(B, 'parametres_effet', E.cible.id) : '?';
+      const op = { ajout: '+', multiplication: '×', remplacement: '=' }[r.operation] || '';
+      return `${s} → ${c} ${op}${nombreFr(r.valeur)}`;
+    },
+  },
+  synergies: {
+    titre: 'Synergies', dom: 'Modificateurs',
+    cols: [C.auto('SYN-', 3), ...NOMS,
+      C.poly('critere', 'Critère', {
+        pantheon: { col: 'pantheon_id', table: 'pantheons', l: 'Panthéon' }, type: { col: 'type_id', table: 'types_heritage', l: 'Type' },
+        sphere: { col: 'sphere_id', table: 'spheres', l: 'Sphère' }, vocation: { col: 'vocation_id', table: 'vocations', l: 'Vocation' },
+      }, { req: true, reel: true, tsvType: 'critere', tsvId: 'critere_id' }), ...DESC],
+    enfants: [{ table: 'synergie_paliers', fk: 'synergie_id', titre: 'Paliers' }],
+  },
+  synergie_paliers: {
+    titre: 'Paliers de synergie', dom: 'Modificateurs',
+    cols: [C.auto('PAL-', 4), C.ref('synergie_id', 'Synergie', 'synergies', { req: true }), C.int('seuil', 'Seuil', { req: true, min: 1 })],
+    uniques: [['synergie_id', 'seuil']],
+    lib: (r, B) => `${libId(B, 'synergies', r.synergie_id)} · ${r.seuil}`,
+    enfants: [{ table: 'modificateurs', fk: 'palier_id', titre: 'Modificateurs', poly: { col: 'source', type: 'palier' } }],
+  },
+  constantes: {
+    titre: 'Constantes', dom: 'Transversal',
+    cols: [C.slug(), C.txt('categorie', 'Catégorie'), C.num('valeur', 'Valeur', { req: true }), C.txt('unite', 'Unité'), C.long('description', 'Description')],
+  },
+};
+for (const t in META) META[t].cle = META[t].cle || (t === 'ecarts_elevation' ? ['depart_id', 'atteinte_id'] : ['id']);
+
+const CLES = {
+  ecarts_elevation: ['depart_id', 'atteinte_id'], entite_spheres: ['entite_id', 'sphere_id'], origine_pantheons: ['origine_id', 'pantheon_id'],
+  vocation_profils: ['vocation_id', 'stat_id'], effet_parametres: ['effet_id', 'parametre_id'], effet_etiquettes: ['effet_id', 'etiquette_id'],
+  heritier_spheres: ['heritier_id', 'sphere_id'], heritier_stats: ['heritier_id', 'stat_id'],
+};
+const cleCols = t => CLES[t] || ['id'];
+const cleDe = (t, r) => cleCols(t).map(c => r[c]).join('|');
+const cleObj = (t, k) => { const cols = cleCols(t), p = String(k).split('|'); return Object.fromEntries(cols.map((c, i) => [c, p[i]])); };
+
+// Ordre de dépendance : sert au chargement, à l’import et au build.
+const TOUTES = ['elevations', 'ecarts_elevation', 'pantheons', 'types_heritage', 'spheres', 'origines', 'origine_pantheons', 'entites', 'entite_spheres',
+  'noms', 'stats', 'vocations', 'vocation_profils', 'ciblages', 'declencheurs', 'types_effet', 'parametres_effet', 'etiquettes', 'pouvoirs',
+  'effets', 'effet_parametres', 'effet_etiquettes', 'synergies', 'synergie_paliers', 'modificateurs', 'constantes',
+  'heritiers', 'heritier_spheres', 'heritier_stats'];
+const TABLES_ECHANGE = [...TOUTES.filter(t => META[t]), 'heritiers'];
+
+// Références, avec suppression en cascade ou bloquante, comme dans schema.sql.
+const REFS = [
+  ['ecarts_elevation', 'depart_id', 'elevations', 1], ['ecarts_elevation', 'atteinte_id', 'elevations', 1],
+  ['entites', 'pantheon_id', 'pantheons', 0], ['entites', 'type_id', 'types_heritage', 0],
+  ['entite_spheres', 'entite_id', 'entites', 1], ['entite_spheres', 'sphere_id', 'spheres', 0],
+  ['origine_pantheons', 'origine_id', 'origines', 1], ['origine_pantheons', 'pantheon_id', 'pantheons', 1],
+  ['noms', 'origine_id', 'origines', 0],
+  ['vocation_profils', 'vocation_id', 'vocations', 1], ['vocation_profils', 'stat_id', 'stats', 0],
+  ['pouvoirs', 'sphere_id', 'spheres', 0], ['pouvoirs', 'declencheur_id', 'declencheurs', 0],
+  ['effets', 'pouvoir_id', 'pouvoirs', 1], ['effets', 'type_effet_id', 'types_effet', 0], ['effets', 'ciblage_id', 'ciblages', 0],
+  ['effet_parametres', 'effet_id', 'effets', 1], ['effet_parametres', 'parametre_id', 'parametres_effet', 0],
+  ['effet_etiquettes', 'effet_id', 'effets', 1], ['effet_etiquettes', 'etiquette_id', 'etiquettes', 0],
+  ['synergies', 'pantheon_id', 'pantheons', 1], ['synergies', 'type_id', 'types_heritage', 1], ['synergies', 'sphere_id', 'spheres', 1], ['synergies', 'vocation_id', 'vocations', 1],
+  ['synergie_paliers', 'synergie_id', 'synergies', 1],
+  ['modificateurs', 'vocation_id', 'vocations', 1], ['modificateurs', 'sphere_id', 'spheres', 1], ['modificateurs', 'elevation_id', 'elevations', 1],
+  ['modificateurs', 'type_id', 'types_heritage', 1], ['modificateurs', 'pouvoir_id', 'pouvoirs', 1], ['modificateurs', 'palier_id', 'synergie_paliers', 1],
+  ['modificateurs', 'stat_id', 'stats', 0], ['modificateurs', 'parametre_id', 'parametres_effet', 0], ['modificateurs', 'etiquette_id', 'etiquettes', 0],
+  ['heritiers', 'elevation_depart_id', 'elevations', 0], ['heritiers', 'entite_id', 'entites', 0], ['heritiers', 'nom_id', 'noms', 0],
+  ['heritiers', 'vocation_id', 'vocations', 0], ['heritiers', 'ciblage_id', 'ciblages', 0], ['heritiers', 'passif_id', 'pouvoirs', 0],
+  ['heritiers', 'pouvoir_1_id', 'pouvoirs', 0], ['heritiers', 'pouvoir_2_id', 'pouvoirs', 0], ['heritiers', 'ultime_id', 'pouvoirs', 0],
+  ['heritier_spheres', 'heritier_id', 'heritiers', 1], ['heritier_spheres', 'sphere_id', 'spheres', 0], ['heritier_spheres', 'elevation_id', 'elevations', 0],
+  ['heritier_stats', 'heritier_id', 'heritiers', 1], ['heritier_stats', 'stat_id', 'stats', 0],
+].map(([de, col, vers, cascade]) => ({ de, col, vers, cascade: !!cascade }));
+
+const TITRES = { ...Object.fromEntries(Object.entries(META).map(([k, m]) => [k, m.titre])), heritiers: 'Héritiers', entite_spheres: 'Sphères héritables', origine_pantheons: 'Origines acceptées', vocation_profils: 'Profils de vocation', effet_parametres: 'Paramètres d’effet', effet_etiquettes: 'Étiquettes d’effet', heritier_spheres: 'Sphères d’Héritier', heritier_stats: 'Stats d’Héritier' };
+
+/* ── Base en mémoire ── */
+class Base {
+  constructor(D) { this.D = D || {}; for (const t of TOUTES) if (!this.D[t]) this.D[t] = []; this.ix = {}; }
+  clone() { return new Base(copie(this.D)); }
+  rows(t) { return this.D[t] || (this.D[t] = []); }
+  index(t) {
+    if (!this.ix[t]) { const m = new Map(); for (const r of this.rows(t)) m.set(cleDe(t, r), r); this.ix[t] = m; }
+    return this.ix[t];
+  }
+  get(t, k) { return vide(k) ? null : this.index(t).get(String(k)) || null; }
+  poser(t, row) {
+    const k = cleDe(t, row), l = this.rows(t), i = l.findIndex(r => cleDe(t, r) === k);
+    if (i >= 0) l[i] = row; else l.push(row);
+    delete this.ix[t];
+  }
+  retirer(t, k) { this.D[t] = this.rows(t).filter(r => cleDe(t, r) !== k); delete this.ix[t]; }
+  remplacerEnfants(t, fk, id, lignes) { this.D[t] = this.rows(t).filter(r => r[fk] !== id).concat(lignes); delete this.ix[t]; }
+  liste(spec, id) { return this.rows(spec.jonction).filter(r => r[spec.fk] === id).map(r => r[spec.vers]); }
+  pivot(spec, id) { const o = {}; for (const r of this.rows(spec.jonction)) if (r[spec.fk] === id) o[r[spec.vers]] = r[spec.val]; return o; }
+  trie(t) {
+    const m = META[t], l = [...this.rows(t)];
+    if (m && m.tri) l.sort((a, b) => m.tri(a, b, this));
+    else l.sort((a, b) => libRow(this, t, a).localeCompare(libRow(this, t, b), 'fr'));
+    return l;
+  }
+}
+function libRow(B, t, r) {
+  if (!r) return '';
+  if (t === 'heritiers') return libHeritier(B, r);
+  const m = META[t];
+  if (m && m.lib) return m.lib(r, B);
+  return r.nom_fr || r.nom || r.id || '';
+}
+function libId(B, t, id) { const r = B.get(t, id); return r ? libRow(B, t, r) : (vide(id) ? '' : String(id)); }
+const ordreElev = (B, id) => (B.get('elevations', id) || { ordre: 99 }).ordre;
+const colDef = (t, n) => (META[t] ? META[t].cols.find(c => c.n === n) : null);
+
+/* ── Héritage : « Enfant de … » ── */
+function enfantDeFr(e) {
+  if (!e || vide(e.nom_fr)) return '';
+  const de = !vide(e.forme_de_fr) ? e.forme_de_fr
+    : ({ le: 'du ', les: 'des ', la: 'de la ', l: 'de l’' }[e.determinant_fr] || (e.elision_fr ? 'd’' : 'de ')) + e.nom_fr;
+  return 'Enfant ' + de;
+}
+function enfantDeEn(e) {
+  if (!e || vide(e.nom_fr)) return '';
+  const of = !vide(e.forme_de_en) ? e.forme_de_en : (e.article_en === 'the' ? 'the ' : '') + (vide(e.nom_en) ? e.nom_fr : e.nom_en);
+  return 'Child of ' + of;
+}
+function origineAcceptee(B, origineId, pantheonId) {
+  const o = B.get('origines', origineId);
+  if (!o) return false;
+  return !!o.universelle || B.liste(LS_ORIGINE, o.id).includes(pantheonId);
+}
+
+/* ── Édition d’une ligne de registre ── */
+function nouvelleEdition(t, init = {}) {
+  const E = {};
+  for (const c of META[t].cols) {
+    if (c.t === 'liste') E[c.n] = [];
+    else if (c.t === 'pivot') E[c.n] = {};
+    else if (c.t === 'poly') E[c.n] = { type: '', id: '' };
+    else E[c.n] = c.def !== undefined ? c.def : null;
+  }
+  return Object.assign(E, copie(init));
+}
+function versEdition(B, t, row) {
+  const E = { ...row };
+  for (const c of META[t].cols) {
+    const k = cleDe(t, row);
+    if (c.t === 'liste') E[c.n] = B.liste(c, k);
+    else if (c.t === 'pivot') E[c.n] = B.pivot(c, k);
+    else if (c.t === 'poly') {
+      const type = c.reel ? row[c.n] : Object.keys(c.choix).find(x => !vide(row[c.choix[x].col]));
+      E[c.n] = { type: type || '', id: type && c.choix[type] ? row[c.choix[type].col] || '' : '' };
+    }
+  }
+  return E;
+}
+function depuisEdition(t, E) {
+  const row = {}, jonctions = [];
+  for (const c of META[t].cols) {
+    const cache = c.si && !c.si(E);
+    if (c.t === 'liste') jonctions.push({ spec: c, valeurs: [...new Set(E[c.n] || [])] });
+    else if (c.t === 'pivot') jonctions.push({ spec: c, valeurs: Object.fromEntries(Object.entries(E[c.n] || {}).filter(([, v]) => !vide(v))) });
+    else if (c.t === 'poly') {
+      const p = E[c.n] || {};
+      for (const [k, ch] of Object.entries(c.choix)) row[ch.col] = k === p.type && !vide(p.id) ? p.id : null;
+      if (c.reel) row[c.n] = vide(p.type) ? null : p.type;
+    } else if (c.t === 'bool') row[c.n] = !!E[c.n];
+    else row[c.n] = cache || vide(E[c.n]) ? null : E[c.n];
+  }
+  if (!vide(E.cree_le)) row.cree_le = E.cree_le;
+  return { row, jonctions };
+}
+const colonnesDB = t => {
+  const out = [];
+  for (const c of META[t].cols) {
+    if (c.t === 'poly') { if (c.reel) out.push(c.n); for (const ch of Object.values(c.choix)) out.push(ch.col); }
+    else if (!c.virt) out.push(c.n);
+  }
+  return out;
+};
+
+function validerEdition(B, t, E, ancienne) {
+  const m = META[t], err = [], nouveau = vide(ancienne);
+  for (const c of m.cols) {
+    if (c.si && !c.si(E)) continue;
+    const v = E[c.n];
+    switch (c.t) {
+      case 'slug':
+        if (vide(v)) err.push(`${c.l} : obligatoire.`);
+        else if (!/^[a-z0-9_]+$/.test(v)) err.push(`${c.l} « ${v} » : minuscules, chiffres et _ seulement.`);
+        else if (nouveau && B.get(t, v)) err.push(`${c.l} « ${v} » : déjà utilisé.`);
+        break;
+      case 'auto':
+        if (!vide(v)) {
+          const pre = m.prefixe ? m.prefixe(E) : c.prefixe;
+          if (!new RegExp('^' + pre + '[0-9]{' + c.chiffres + ',}$').test(v)) err.push(`Identifiant « ${v} » : format attendu ${pre}${'0'.repeat(c.chiffres - 1)}1.`);
+          else if (nouveau && B.get(t, v)) err.push(`Identifiant ${v} : déjà utilisé.`);
+        }
+        break;
+      case 'texte': case 'long': case 'couleur':
+        if (c.req && vide(v)) err.push(`${c.l} : obligatoire.`);
+        if (c.t === 'couleur' && !vide(v) && !/^#[0-9A-Fa-f]{6}$/.test(v)) err.push(`${c.l} : format #RRVVBB attendu.`);
+        break;
+      case 'entier': case 'nombre':
+        if (vide(v)) { if (c.req) err.push(`${c.l} : obligatoire.`); break; }
+        if (typeof v !== 'number' || !Number.isFinite(v)) { err.push(`${c.l} : nombre invalide.`); break; }
+        if (c.t === 'entier' && !Number.isInteger(v)) err.push(`${c.l} : nombre entier attendu.`);
+        if (c.min !== undefined && (c.minExcl ? v <= c.min : v < c.min)) err.push(`${c.l} : ${c.minExcl ? 'strictement supérieur à' : 'au moins'} ${nombreFr(c.min)}.`);
+        if (c.max !== undefined && v > c.max) err.push(`${c.l} : au plus ${nombreFr(c.max)}.`);
+        break;
+      case 'bool':
+        if (v !== null && v !== undefined && typeof v !== 'boolean') err.push(`${c.l} : oui ou non attendu.`);
+        break;
+      case 'enum':
+        if (vide(v)) { if (c.req) err.push(`${c.l} : obligatoire.`); }
+        else if (!c.vals.some(([k]) => k === v)) err.push(`${c.l} : valeur inconnue « ${v} ».`);
+        break;
+      case 'ref':
+        if (vide(v)) { if (c.req) err.push(`${c.l} : obligatoire.`); }
+        else if (!B.get(c.table, v)) err.push(`${c.l} : « ${v} » introuvable.`);
+        break;
+      case 'liste':
+        for (const x of v || []) if (!B.get(c.table, x)) err.push(`${c.l} : « ${x} » introuvable.`);
+        break;
+      case 'pivot':
+        for (const [k, x] of Object.entries(v || {})) {
+          if (!B.get(c.table, k)) err.push(`${c.l} : « ${k} » introuvable.`);
+          if (vide(x)) continue;
+          if (typeof x !== 'number' || !Number.isFinite(x)) err.push(`${c.l} : valeur invalide pour ${k}.`);
+          else if (c.min !== undefined && x < c.min) err.push(`${c.l} : ${k} doit valoir au moins ${nombreFr(c.min)}.`);
+        }
+        break;
+      case 'poly': {
+        const p = v || {};
+        if (vide(p.type) || vide(p.id)) { if (c.req) err.push(`${c.l} : obligatoire.`); break; }
+        const ch = c.choix[p.type];
+        if (!ch) { err.push(`${c.l} : type inconnu « ${p.type} ».`); break; }
+        const r = B.get(ch.table, p.id);
+        if (!r) err.push(`${c.l} : « ${p.id} » introuvable parmi ${TITRES[ch.table].toLowerCase()}.`);
+        else if (ch.filtre && !ch.filtre(r)) err.push(`${c.l} : ${ch.refus}`);
+        break;
+      }
+    }
+  }
+  if (!nouveau) {
+    const ancien = B.get(t, ancienne);
+    for (const c of m.cols) if (c.fige && ancien && ancien[c.n] !== E[c.n]) err.push(`${c.l} : ne peut plus changer après la création.`);
+  }
+  for (const u of m.uniques || []) {
+    if (u.some(c => vide(E[c]))) continue;
+    const autre = B.rows(t).find(r => cleDe(t, r) !== ancienne && u.every(c => r[c] === E[c]));
+    if (autre) err.push(`Doublon : ${u.map(c => (colDef(t, c) || { l: c }).l).join(' + ')} déjà pris par ${libRow(B, t, autre)}.`);
+  }
+  if (CLES[t]) { const k = cleDe(t, E); if (k !== ancienne && B.get(t, k)) err.push('Cette combinaison existe déjà.'); }
+  if (m.verif) err.push(...m.verif(E, B));
+  return err;
+}
+
+/* ── Héritiers ── */
+const CHAMPS_POUVOIRS = [['passif_id', 'passif', 'Passif'], ['pouvoir_1_id', 'pouvoir', 'Pouvoir 1'], ['pouvoir_2_id', 'pouvoir', 'Pouvoir 2'], ['ultime_id', 'ultime', 'Ultime']];
+const COLS_HERITIER = ['id', 'statut', 'elevation_depart_id', 'entite_id', 'nom_id', 'vocation_id', 'ciblage_id', 'passif_id', 'pouvoir_1_id', 'pouvoir_2_id', 'ultime_id', 'etalon', 'notes'];
+const STATUTS = [['brouillon', 'Brouillon'], ['valide', 'Validé'], ['en_jeu', 'En jeu'], ['retire', 'Retiré']];
+
+function slotsSpheres(B) {
+  const els = [...B.rows('elevations')].sort((a, b) => a.ordre - b.ordre), out = [];
+  let prec = 0;
+  for (const e of els) {
+    for (let k = prec; k < e.nb_spheres; k++) {
+      const n = out.filter(s => s.elev === e.id).length + 1;
+      out.push({ elev: e.id, col: 'sphere_' + e.id + (n > 1 ? '_' + n : '') });
+    }
+    prec = Math.max(prec, e.nb_spheres);
+  }
+  return out;
+}
+function heritierVide(B) {
+  return { id: null, statut: 'brouillon', elevation_depart_id: null, entite_id: null, nom_id: null, vocation_id: null, ciblage_id: null,
+    passif_id: null, pouvoir_1_id: null, pouvoir_2_id: null, ultime_id: null, etalon: false, notes: null,
+    spheres: slotsSpheres(B).map(s => ({ sphere_id: null, elevation_id: s.elev })), stats: {} };
+}
+function heritierDepuisBase(B, id) {
+  const r = B.get('heritiers', id);
+  if (!r) return null;
+  const H = { ...heritierVide(B), ...Object.fromEntries(COLS_HERITIER.map(c => [c, r[c] ?? null])) };
+  H.etalon = !!r.etalon;
+  const rangees = B.rows('heritier_spheres').filter(s => s.heritier_id === id)
+    .sort((a, b) => ordreElev(B, a.elevation_id) - ordreElev(B, b.elevation_id) || (a.ordre || 0) - (b.ordre || 0));
+  const slots = slotsSpheres(B), libres = [...rangees];
+  H.spheres = slots.map(s => { const i = libres.findIndex(x => x.elevation_id === s.elev); const x = i >= 0 ? libres.splice(i, 1)[0] : null; return { sphere_id: x ? x.sphere_id : null, elevation_id: s.elev }; });
+  for (const x of libres) H.spheres.push({ sphere_id: x.sphere_id, elevation_id: x.elevation_id });
+  for (const s of B.rows('heritier_stats')) if (s.heritier_id === id) H.stats[s.stat_id] = s.valeur;
+  return H;
+}
+function libHeritier(B, r) { const n = B.get('noms', r.nom_id); return n ? n.nom : r.id || 'Sans nom'; }
+
+function validerHeritier(B, H) {
+  const out = [], brouillon = H.statut === 'brouillon';
+  const err = (champ, msg) => out.push({ niv: 'erreur', champ, msg });
+  const strict = (champ, msg) => out.push({ niv: brouillon ? 'afaire' : 'erreur', champ, msg });
+  const alerte = (champ, msg) => out.push({ niv: 'alerte', champ, msg });
+
+  if (!STATUTS.some(([k]) => k === H.statut)) err('statut', `Statut inconnu « ${H.statut} ».`);
+  if (!vide(H.id) && !/^HER-[0-9]{4,}$/.test(H.id)) err('id', `Identifiant « ${H.id} » : format attendu HER-0001.`);
+  for (const [c, t, l] of [['elevation_depart_id', 'elevations', 'Élévation de départ'], ['entite_id', 'entites', 'Entité parente'], ['nom_id', 'noms', 'Nom'], ['vocation_id', 'vocations', 'Vocation'], ['ciblage_id', 'ciblages', 'Ciblage favori']])
+    if (!vide(H[c]) && !B.get(t, H[c])) err(c, `${l} : « ${H[c]} » introuvable.`);
+  for (const [c, emp, l] of CHAMPS_POUVOIRS) {
+    if (vide(H[c])) continue;
+    const p = B.get('pouvoirs', H[c]);
+    if (!p) err(c, `${l} : pouvoir « ${H[c]} » introuvable.`);
+    else if (p.emplacement !== emp) err(c, `${l} : ${p.nom_fr} est un ${p.emplacement}, pas un ${emp}.`);
+  }
+  if (!vide(H.pouvoir_1_id) && H.pouvoir_1_id === H.pouvoir_2_id) err('pouvoir_2_id', 'Les deux pouvoirs doivent être différents.');
+  const cib = B.get('ciblages', H.ciblage_id);
+  if (cib && cib.camp !== 'ennemi') err('ciblage_id', `Le ciblage favori doit viser un ennemi ; ${cib.nom_fr} vise : ${cib.camp === 'soi' ? 'soi' : 'un allié'}.`);
+  const ent = B.get('entites', H.entite_id), nom = B.get('noms', H.nom_id);
+  if (ent && nom && !origineAcceptee(B, nom.origine_id, ent.pantheon_id))
+    err('nom_id', `L’origine ${libId(B, 'origines', nom.origine_id)} du nom ${nom.nom} n’est pas acceptée par le panthéon ${libId(B, 'pantheons', ent.pantheon_id)}.`);
+  if (ent && nom && H.statut !== 'retire') {
+    const autre = B.rows('heritiers').find(h => h.id !== H.id && h.statut !== 'retire' && h.nom_id === H.nom_id && h.entite_id === H.entite_id);
+    if (autre) err('nom_id', `Un autre ${nom.nom} a déjà ce parent (${autre.id}).`);
+  }
+  const sph = (H.spheres || []).filter(s => !vide(s.sphere_id)), vus = new Set();
+  for (const s of sph) {
+    if (!B.get('spheres', s.sphere_id)) err('spheres', `Sphère « ${s.sphere_id} » introuvable.`);
+    if (!B.get('elevations', s.elevation_id)) err('spheres', `Élévation « ${s.elevation_id} » introuvable.`);
+    if (vus.has(s.sphere_id)) err('spheres', `La sphère ${libId(B, 'spheres', s.sphere_id)} est choisie deux fois.`);
+    vus.add(s.sphere_id);
+  }
+  for (const [k, v] of Object.entries(H.stats || {})) {
+    if (vide(v)) continue;
+    const st = B.get('stats', k);
+    if (!st) { err('stats', `Stat « ${k} » introuvable.`); continue; }
+    if (typeof v !== 'number' || !Number.isFinite(v)) { err('stat_' + k, `${st.nom_fr} : valeur invalide.`); continue; }
+    if (!vide(st.min) && v < st.min) alerte('stat_' + k, `${st.nom_fr} sous son minimum (${nombreFr(st.min)}).`);
+    if (!vide(st.max) && v > st.max) alerte('stat_' + k, `${st.nom_fr} au-dessus de son maximum (${nombreFr(st.max)}).`);
+  }
+  const manque = [['elevation_depart_id', 'élévation'], ['entite_id', 'entité parente'], ['nom_id', 'nom'], ['vocation_id', 'vocation'], ['ciblage_id', 'ciblage favori'],
+    ['passif_id', 'passif'], ['pouvoir_1_id', 'pouvoir 1'], ['pouvoir_2_id', 'pouvoir 2'], ['ultime_id', 'ultime']].filter(([c]) => vide(H[c])).map(([, l]) => l);
+  if (manque.length) strict('fiche', `À compléter : ${manque.join(', ')}.`);
+  for (const e of [...B.rows('elevations')].sort((a, b) => a.ordre - b.ordre)) {
+    const nb = sph.filter(s => ordreElev(B, s.elevation_id) <= e.ordre).length;
+    if (nb !== e.nb_spheres) { strict('spheres', `${nb} sphère${nb > 1 ? 's' : ''} débloquée${nb > 1 ? 's' : ''} en ${e.nom_fr}, ${e.nb_spheres} attendue${e.nb_spheres > 1 ? 's' : ''}.`); break; }
+  }
+  if (ent && sph.length) {
+    const herit = new Set(B.liste(LS_ENTITE, ent.id));
+    if (!sph.some(s => herit.has(s.sphere_id))) strict('spheres', `Aucune sphère n’est héritée de ${ent.nom_fr}.`);
+  }
+  const ens = new Set(sph.map(s => s.sphere_id));
+  for (const [c, , l] of CHAMPS_POUVOIRS) {
+    const p = B.get('pouvoirs', H[c]);
+    if (p && !ens.has(p.sphere_id)) strict(c, `${l} : ${p.nom_fr} relève de la sphère ${libId(B, 'spheres', p.sphere_id)}, qui n’est pas l’une des siennes.`);
+  }
+  return out;
+}
+
+/* ── Écriture dans une base (commune aux deux sources) ── */
+function nouvelId(B, t, E, compteurs) {
+  let pre, chiffres;
+  if (t === 'heritiers') { pre = 'HER-'; chiffres = 4; }
+  else { const m = META[t], c = m.cols.find(x => x.t === 'auto'); pre = m.prefixe ? m.prefixe(E) : c.prefixe; chiffres = c.chiffres; }
+  const nums = B.rows(t).map(r => r.id).filter(id => id && id.startsWith(pre)).map(id => parseInt(id.slice(pre.length), 10)).filter(Number.isFinite);
+  const n = Math.max(compteurs[pre] || 0, 0, ...nums) + 1;
+  compteurs[pre] = n;
+  return pre + String(n).padStart(chiffres, '0');
+}
+function appliquerLigne(B, t, row, jonctions, ancienne, opts = {}) {
+  const avant = vide(ancienne) ? null : B.get(t, ancienne);
+  if (META[t].cols[0].t === 'auto' && vide(row.id)) row.id = nouvelId(B, t, row, opts.compteurs || {});
+  const k = cleDe(t, row);
+  if (avant && ancienne !== k) B.retirer(t, ancienne);
+  const date = maintenant();
+  const final = { ...row, cree_le: (avant && avant.cree_le) || row.cree_le || date, modifie_le: row.modifie_le || date };
+  B.poser(t, final);
+  const jav = {};
+  for (const j of jonctions || []) {
+    const s = j.spec;
+    jav[s.n] = s.t === 'pivot' ? B.pivot(s, k) : B.liste(s, k);
+    const lignes = s.t === 'pivot'
+      ? Object.entries(j.valeurs).map(([x, v]) => ({ [s.fk]: k, [s.vers]: x, [s.val]: v }))
+      : j.valeurs.map(x => ({ [s.fk]: k, [s.vers]: x }));
+    B.remplacerEnfants(s.jonction, s.fk, k, lignes);
+    if (avant && ancienne !== k) B.remplacerEnfants(s.jonction, s.fk, ancienne, []);
+  }
+  if (opts.journal) {
+    const champs = avant ? Object.keys(final).filter(c => !['cree_le', 'modifie_le'].includes(c) && JSON.stringify(final[c] ?? null) !== JSON.stringify(avant[c] ?? null)) : null;
+    for (const j of jonctions || []) if (JSON.stringify(jav[j.spec.n]) !== JSON.stringify(j.spec.t === 'pivot' ? B.pivot(j.spec, k) : B.liste(j.spec, k))) (champs || []).push(j.spec.n);
+    if (!avant || champs.length) opts.journal({ table_nom: t, ligne_id: k, operation: avant ? 'UPDATE' : 'INSERT', champs });
+  }
+  return final;
+}
+function appliquerHeritier(B, H, opts = {}) {
+  const avant = vide(H.id) ? null : B.get('heritiers', H.id);
+  const id = vide(H.id) ? nouvelId(B, 'heritiers', H, opts.compteurs || {}) : H.id;
+  const date = maintenant();
+  const row = Object.fromEntries(COLS_HERITIER.map(c => [c, H[c] ?? null]));
+  row.id = id; row.etalon = !!H.etalon; row.cree_le = (avant && avant.cree_le) || date; row.modifie_le = date;
+  B.poser('heritiers', row);
+  const sphAvant = JSON.stringify(B.rows('heritier_spheres').filter(s => s.heritier_id === id).map(s => [s.sphere_id, s.elevation_id]));
+  const stAvant = JSON.stringify(B.pivot({ jonction: 'heritier_stats', fk: 'heritier_id', vers: 'stat_id', val: 'valeur' }, id));
+  B.remplacerEnfants('heritier_spheres', 'heritier_id', id, (H.spheres || []).filter(s => !vide(s.sphere_id)).map((s, i) => ({ heritier_id: id, sphere_id: s.sphere_id, elevation_id: s.elevation_id, ordre: i + 1 })));
+  B.remplacerEnfants('heritier_stats', 'heritier_id', id, Object.entries(H.stats || {}).filter(([, v]) => !vide(v)).map(([k, v]) => ({ heritier_id: id, stat_id: k, valeur: v })));
+  if (opts.journal) {
+    const champs = avant ? COLS_HERITIER.filter(c => c !== 'id' && JSON.stringify(row[c] ?? null) !== JSON.stringify(avant[c] ?? null)) : null;
+    if (avant && sphAvant !== JSON.stringify(B.rows('heritier_spheres').filter(s => s.heritier_id === id).map(s => [s.sphere_id, s.elevation_id]))) champs.push('spheres');
+    if (avant && stAvant !== JSON.stringify(B.pivot({ jonction: 'heritier_stats', fk: 'heritier_id', vers: 'stat_id', val: 'valeur' }, id))) champs.push('stats');
+    if (!avant || champs.length) opts.journal({ table_nom: 'heritiers', ligne_id: id, operation: avant ? 'UPDATE' : 'INSERT', champs });
+  }
+  return id;
+}
+function planSuppression(B, t, cle) {
+  const bloque = [], cascade = [], vus = new Set([t + ':' + cle]);
+  const visiter = (tt, id) => {
+    for (const ref of REFS) {
+      if (ref.vers !== tt) continue;
+      for (const r of B.rows(ref.de)) {
+        if (r[ref.col] !== id) continue;
+        const k = cleDe(ref.de, r), tag = ref.de + ':' + k;
+        if (vus.has(tag)) continue;
+        vus.add(tag);
+        if (ref.cascade) { cascade.push({ t: ref.de, cle: k }); if (!CLES[ref.de]) visiter(ref.de, k); }
+        else bloque.push({ t: ref.de, cle: k, col: ref.col });
+      }
+    }
+  };
+  if (!CLES[t]) visiter(t, cle);
+  return { bloque, cascade };
+}
+function appliquerSuppression(B, t, cle, plan, journal) {
+  for (const c of plan.cascade) B.retirer(c.t, c.cle);
+  B.retirer(t, cle);
+  if (journal) journal({ table_nom: t, ligne_id: cle, operation: 'DELETE', champs: null });
+}
+
+/* ── Sources de données ── */
+const REGLAGES_CLE = 'forge-ichor-reglages';
+const LOCAL_CLE = 'forge-ichor-base-v1';
+let BASE = new Base();
+const DEPOT = {
+  mode: 'local',      // 'local' ou 'supabase'
+  compteurs: {},
+  journal: [],
+  client: null,
+  utilisateur: null,
+  editeur: false,
+  pret: false,
+};
+function lireReglages() { try { return JSON.parse(localStorage.getItem(REGLAGES_CLE) || '{}'); } catch (e) { return {}; } }
+function ecrireReglages(o) { try { localStorage.setItem(REGLAGES_CLE, JSON.stringify({ ...lireReglages(), ...o })); } catch (e) { /* stockage indisponible */ } }
+
+const DONNEES_INITIALES = () => ({
+  elevations: [
+    { id: 'mortel', nom_fr: 'Mortel', nom_en: 'Mortal', ordre: 1, nb_spheres: 1, spheres_libres: 0 },
+    { id: 'heros', nom_fr: 'Héros', nom_en: 'Hero', ordre: 2, nb_spheres: 1, spheres_libres: 0 },
+    { id: 'demi_dieu', nom_fr: 'Demi-Dieu', nom_en: 'Demigod', ordre: 3, nb_spheres: 2, spheres_libres: 0 },
+    { id: 'avatar', nom_fr: 'Avatar', nom_en: 'Avatar', ordre: 4, nb_spheres: 3, spheres_libres: 1 },
+  ],
+  types_heritage: [{ id: 'dieu', nom_fr: 'Dieu', nom_en: 'God' }, { id: 'titan', nom_fr: 'Titan', nom_en: 'Titan' }, { id: 'dragon', nom_fr: 'Dragon', nom_en: 'Dragon' }],
+  origines: [{ id: 'commune', nom_fr: 'Commune', nom_en: 'Common', universelle: true }],
+  ciblages: [
+    ['tete', 'Tête', 'Front', 'ennemi', 'Ennemi au premier rang de la grille.'], ['affaibli', 'Plus affaibli', 'Weakest', 'ennemi', 'Ennemi au plus faible pourcentage de PV.'],
+    ['robuste', 'Plus robuste', 'Sturdiest', 'ennemi', 'Ennemi aux PV maximum les plus élevés.'], ['dangereux', 'Plus dangereux', 'Most dangerous', 'ennemi', 'Ennemi à l’ATK la plus élevée.'],
+    ['arriere_garde', 'Arrière-garde', 'Back line', 'ennemi', 'Ennemi au dernier rang de la grille.'], ['boss', 'Boss d’abord', 'Boss first', 'ennemi', 'Le boss s’il est présent, sinon la Tête.'],
+    ['hasard', 'Au hasard', 'Random', 'ennemi', 'Ennemi tiré au hasard.'], ['soi', 'Soi', 'Self', 'soi', 'Le lanceur.'],
+    ['equipe', 'Équipe', 'Team', 'allie', 'Tous les alliés vivants.'], ['allie_blesse', 'Allié le plus blessé', 'Most wounded ally', 'allie', 'Allié au plus faible pourcentage de PV.'],
+  ].map(([id, nom_fr, nom_en, camp, description_fr]) => ({ id, nom_fr, nom_en, camp, description_fr })),
+  declencheurs: [['permanent', 'Permanent', 'Permanent', null], ['debut_combat', 'Début du combat', 'Battle start', null], ['sous_pv', 'Sous X % de PV', 'Below X% HP', '%'],
+    ['toutes_n_attaques', 'Toutes les N attaques', 'Every N attacks', 'attaques'], ['ennemi_vaincu', 'À chaque ennemi vaincu', 'On enemy defeated', null]]
+    .map(([id, nom_fr, nom_en, unite_valeur]) => ({ id, nom_fr, nom_en, unite_valeur })),
+  stats: [['pv', 'PV', 'HP', 'PV', 'HP', 'PV'], ['atk', 'Attaque', 'Attack', 'ATK', 'ATK', 'ATK'], ['vitesse', 'Vitesse', 'Speed', 'VIT', 'SPD', 'attaques/s'],
+    ['critique', 'Critique', 'Critical chance', 'CRIT', 'CRIT', '%'], ['degats_critiques', 'Dégâts critiques', 'Critical damage', 'DCRIT', 'CDMG', '×'],
+    ['recharge', 'Recharge', 'Cooldown', 'RCH', 'CDR', '%'], ['energie', 'Énergie', 'Energy', 'NRG', 'NRG', '%'], ['menace', 'Menace', 'Threat', 'MEN', 'THR', 'poids']]
+    .map(([id, nom_fr, nom_en, abreviation_fr, abreviation_en, unite], i) => ({ id, nom_fr, nom_en, abreviation_fr, abreviation_en, unite, ordre: i + 1 })),
+});
+function baseInitiale() {
+  const D = DONNEES_INITIALES(), B = new Base();
+  for (const [t, rows] of Object.entries(D)) for (const r of rows) {
+    const { row } = depuisEdition(t, nouvelleEdition(t, r));
+    B.poser(t, { ...row, cree_le: maintenant(), modifie_le: maintenant() });
+  }
+  for (const d of B.rows('elevations')) for (const a of B.rows('elevations')) if (a.ordre >= d.ordre) B.poser('ecarts_elevation', { depart_id: d.id, atteinte_id: a.id, coefficient: 1 });
+  return B;
+}
+
+const Local = {
+  charger() {
+    try {
+      const t = localStorage.getItem(LOCAL_CLE);
+      if (t) { const o = JSON.parse(t); DEPOT.compteurs = o.compteurs || {}; DEPOT.journal = o.journal || []; return new Base(o.D); }
+    } catch (e) { /* base locale illisible : repart de zéro */ }
+    DEPOT.compteurs = {}; DEPOT.journal = [];
+    return baseInitiale();
+  },
+  persister() {
+    if (DEPOT.mode !== 'local') return true;
+    try {
+      localStorage.setItem(LOCAL_CLE, JSON.stringify({ v: 1, D: BASE.D, compteurs: DEPOT.compteurs, journal: DEPOT.journal.slice(-3000) }));
+      return true;
+    } catch (e) { throw new ErreurForge('Enregistrement local impossible : ' + e.message); }
+  },
+  noter(e) { DEPOT.journal.push({ id: (DEPOT.journal.at(-1)?.id || 0) + 1, date: maintenant(), auteur: 'local', ...e }); },
+};
+
+function erreurSupa(error, contexte) {
+  const m = (error && (error.message || error.error_description || error.msg)) || String(error);
+  let msg = m;
+  if (/Failed to fetch|NetworkError|Load failed/i.test(m)) msg = 'Supabase injoignable : vérifie ta connexion et l’URL du projet.';
+  else if (/JWT|apikey|Invalid API key/i.test(m)) msg = 'Clé publishable refusée : copie-la à nouveau depuis les réglages API du projet.';
+  else if (/row-level security|permission denied/i.test(m)) msg = 'Accès refusé : ce compte n’est pas déclaré dans la table editeurs.';
+  else if (/duplicate key/i.test(m)) msg = 'Doublon refusé par la base : ' + (error.details || m);
+  else if (/foreign key/i.test(m)) msg = 'Référence refusée par la base : ' + (error.details || m);
+  return new ErreurForge((contexte ? contexte + ' : ' : '') + msg);
+}
+const Supa = {
+  pret() { return typeof window !== 'undefined' && window.supabase && typeof window.supabase.createClient === 'function'; },
+  creer(url, cle) {
+    DEPOT.client = window.supabase.createClient(url, cle, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'forge-ichor-auth' } });
+    return DEPOT.client;
+  },
+  async session() {
+    const { data } = await DEPOT.client.auth.getSession();
+    DEPOT.utilisateur = data && data.session ? data.session.user : null;
+    return DEPOT.utilisateur;
+  },
+  async connecter(email, mdp) {
+    const { data, error } = await DEPOT.client.auth.signInWithPassword({ email, password: mdp });
+    if (error) throw new ErreurForge(/Invalid login/i.test(error.message) ? 'E-mail ou mot de passe incorrect.' : error.message);
+    DEPOT.utilisateur = data.user;
+    return data.user;
+  },
+  async deconnecter() { if (DEPOT.client) await DEPOT.client.auth.signOut(); DEPOT.utilisateur = null; DEPOT.editeur = false; },
+  async verifierEditeur() {
+    const { data, error } = await DEPOT.client.from('editeurs').select('user_id').eq('user_id', DEPOT.utilisateur.id);
+    if (error) throw erreurSupa(error, 'Vérification du compte');
+    DEPOT.editeur = data.length > 0;
+    return DEPOT.editeur;
+  },
+  async tout(t) {
+    const out = [];
+    for (let a = 0; ; a += 1000) {
+      const { data, error } = await DEPOT.client.from(t).select('*').order(cleCols(t)[0]).range(a, a + 999);
+      if (error) throw erreurSupa(error, TITRES[t] || t);
+      out.push(...data);
+      if (data.length < 1000) break;
+    }
+    return out;
+  },
+  async charger(progression) {
+    const D = {};
+    let i = 0;
+    for (const t of TOUTES) { D[t] = await this.tout(t); if (progression) progression(++i, TOUTES.length, t); }
+    return new Base(D);
+  },
+  async ligne(t, row, jonctions, ancienne) {
+    const envoi = Object.fromEntries(colonnesDB(t).map(c => [c, row[c] ?? null]));
+    let res;
+    if (vide(ancienne)) {
+      if (META[t].cols[0].t === 'auto' && vide(envoi.id)) delete envoi.id;
+      res = await DEPOT.client.from(t).insert(envoi).select().single();
+    } else {
+      res = await DEPOT.client.from(t).update(envoi).match(cleObj(t, ancienne)).select().single();
+    }
+    if (res.error) throw erreurSupa(res.error);
+    const saved = res.data, k = cleDe(t, saved);
+    for (const j of jonctions || []) await this.synchroniser(j.spec, k, j.valeurs);
+    return saved;
+  },
+  async synchroniser(s, id, valeurs) {
+    if (s.t === 'liste') {
+      const avant = new Set(BASE.liste(s, id)), voulu = new Set(valeurs);
+      const ajouts = [...voulu].filter(x => !avant.has(x)).map(x => ({ [s.fk]: id, [s.vers]: x }));
+      const retraits = [...avant].filter(x => !voulu.has(x));
+      if (ajouts.length) { const { error } = await DEPOT.client.from(s.jonction).insert(ajouts); if (error) throw erreurSupa(error, s.l); }
+      if (retraits.length) { const { error } = await DEPOT.client.from(s.jonction).delete().eq(s.fk, id).in(s.vers, retraits); if (error) throw erreurSupa(error, s.l); }
+    } else {
+      const avant = BASE.pivot(s, id);
+      const ecrire = Object.entries(valeurs).filter(([k, v]) => avant[k] !== v).map(([k, v]) => ({ [s.fk]: id, [s.vers]: k, [s.val]: v }));
+      const retraits = Object.keys(avant).filter(k => !(k in valeurs));
+      if (ecrire.length) { const { error } = await DEPOT.client.from(s.jonction).upsert(ecrire, { onConflict: `${s.fk},${s.vers}` }); if (error) throw erreurSupa(error, s.l); }
+      if (retraits.length) { const { error } = await DEPOT.client.from(s.jonction).delete().eq(s.fk, id).in(s.vers, retraits); if (error) throw erreurSupa(error, s.l); }
+    }
+  },
+  // Relit une ligne et ses listes liées depuis la base, après un refus en cours d’écriture.
+  async recharger(t, cle) {
+    const { data, error } = await DEPOT.client.from(t).select('*').match(cleObj(t, cle));
+    if (error) throw erreurSupa(error);
+    if (data[0]) BASE.poser(t, data[0]); else BASE.retirer(t, cle);
+    for (const c of META[t].cols.filter(x => x.t === 'liste' || x.t === 'pivot')) {
+      const r = await DEPOT.client.from(c.jonction).select('*').eq(c.fk, cle);
+      if (r.error) throw erreurSupa(r.error);
+      BASE.remplacerEnfants(c.jonction, c.fk, cle, r.data);
+    }
+  },
+  async supprimer(t, cle) {
+    const { error } = await DEPOT.client.from(t).delete().match(cleObj(t, cle));
+    if (error) throw erreurSupa(error);
+  },
+  charge(H) {
+    const p = Object.fromEntries(COLS_HERITIER.map(c => [c, H[c] ?? null]));
+    p.etalon = !!H.etalon;
+    if (vide(p.id)) delete p.id;
+    p.spheres = (H.spheres || []).filter(s => !vide(s.sphere_id)).map(s => ({ sphere_id: s.sphere_id, elevation_id: s.elevation_id }));
+    p.stats = Object.fromEntries(Object.entries(H.stats || {}).filter(([, v]) => !vide(v)));
+    return p;
+  },
+  async heritier(H) {
+    const { data, error } = await DEPOT.client.rpc('enregistrer_heritier', { p: this.charge(H) });
+    if (error) throw erreurSupa(error);
+    const id = data;
+    const [a, b, c] = await Promise.all([
+      DEPOT.client.from('heritiers').select('*').eq('id', id),
+      DEPOT.client.from('heritier_spheres').select('*').eq('heritier_id', id),
+      DEPOT.client.from('heritier_stats').select('*').eq('heritier_id', id),
+    ]);
+    for (const r of [a, b, c]) if (r.error) throw erreurSupa(r.error);
+    BASE.poser('heritiers', a.data[0]);
+    BASE.remplacerEnfants('heritier_spheres', 'heritier_id', id, b.data);
+    BASE.remplacerEnfants('heritier_stats', 'heritier_id', id, c.data);
+    return id;
+  },
+  async journal(n = 300) {
+    const { data, error } = await DEPOT.client.from('journal').select('*').order('id', { ascending: false }).limit(n);
+    if (error) throw erreurSupa(error, 'Journal');
+    return data;
+  },
+};
+
+/* ── API d’écriture utilisée par l’interface ── */
+const Ecrire = {
+  async ligne(t, E, ancienne) {
+    const errs = validerEdition(BASE, t, E, ancienne);
+    if (errs.length) throw new ErreurForge(errs);
+    const { row, jonctions } = depuisEdition(t, E);
+    if (DEPOT.mode === 'supabase') {
+      let saved;
+      try { saved = await Supa.ligne(t, row, jonctions, ancienne); }
+      catch (e) { if (!vide(ancienne)) await Supa.recharger(t, ancienne).catch(() => {}); throw e; }
+      appliquerLigne(BASE, t, saved, jonctions, ancienne);
+      return cleDe(t, saved);
+    }
+    const final = appliquerLigne(BASE, t, row, jonctions, ancienne, { compteurs: DEPOT.compteurs, journal: e => Local.noter(e) });
+    Local.persister();
+    return cleDe(t, final);
+  },
+  async supprimer(t, cle) {
+    const plan = planSuppression(BASE, t, cle);
+    if (plan.bloque.length) throw new ErreurForge(`Suppression impossible : ${plan.bloque.length} élément${plan.bloque.length > 1 ? 's' : ''} y fai${plan.bloque.length > 1 ? 'ont' : 't'} référence.`);
+    if (DEPOT.mode === 'supabase') { await Supa.supprimer(t, cle); appliquerSuppression(BASE, t, cle, plan); return; }
+    appliquerSuppression(BASE, t, cle, plan, e => Local.noter(e));
+    Local.persister();
+  },
+  async heritier(H) {
+    const errs = validerHeritier(BASE, H).filter(x => x.niv === 'erreur');
+    if (errs.length) throw new ErreurForge(errs.map(x => x.msg));
+    if (DEPOT.mode === 'supabase') return Supa.heritier(H);
+    const id = appliquerHeritier(BASE, H, { compteurs: DEPOT.compteurs, journal: e => Local.noter(e) });
+    Local.persister();
+    return id;
+  },
+};
+
+/* ── TSV ── */
+function lireTSV(texte) {
+  const s = texte.replace(/^﻿/, ''), lignes = [];
+  let champ = '', ligne = [], i = 0, guillemets = false;
+  while (i < s.length) {
+    const ch = s[i];
+    if (guillemets) {
+      if (ch === '"') { if (s[i + 1] === '"') { champ += '"'; i += 2; continue; } guillemets = false; i++; continue; }
+      champ += ch; i++; continue;
+    }
+    if (ch === '"' && champ === '') { guillemets = true; i++; continue; }
+    if (ch === '\t') { ligne.push(champ); champ = ''; i++; continue; }
+    if (ch === '\r' || ch === '\n') { ligne.push(champ); lignes.push(ligne); champ = ''; ligne = []; if (ch === '\r' && s[i + 1] === '\n') i++; i++; continue; }
+    champ += ch; i++;
+  }
+  if (champ !== '' || ligne.length) { ligne.push(champ); lignes.push(ligne); }
+  while (lignes.length && lignes.at(-1).every(c => c.trim() === '')) lignes.pop();
+  if (!lignes.length) return { entetes: [], lignes: [] };
+  const entetes = lignes[0].map(h => h.trim());
+  return { entetes, lignes: lignes.slice(1).filter(l => l.some(c => c.trim() !== '')).map(l => Object.fromEntries(entetes.map((h, k) => [h, (l[k] ?? '').trim()]))) };
+}
+function ecrireTSV(entetes, lignes) {
+  const q = v => { const s = v == null ? '' : String(v); return /[\t\n\r"]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  return '﻿' + [entetes, ...lignes].map(l => l.map(q).join('\t')).join('\r\n') + '\r\n';
+}
+const celluleTSV = v => (v === true ? 'oui' : v === false ? 'non' : typeof v === 'number' ? nombreFr(v) : Array.isArray(v) ? v.join('|') : v ?? '');
+const prefixePivot = c => (c.n === 'profil' ? 'profil_' : c.n + '_');
+
+function entetesTable(B, t) {
+  if (t === 'heritiers') return [...COLS_HERITIER.filter(c => !['etalon', 'notes'].includes(c)), ...slotsSpheres(B).map(s => s.col),
+    ...B.trie('stats').map(s => 'stat_' + s.id), 'etalon', 'notes'];
+  const out = [];
+  for (const c of META[t].cols) {
+    if (c.t === 'pivot') out.push(...B.trie(c.table).map(r => prefixePivot(c) + r.id));
+    else if (c.t === 'poly') out.push(c.tsvType, c.tsvId);
+    else out.push(c.n);
+  }
+  return out;
+}
+function exporterTable(B, t) {
+  const entetes = entetesTable(B, t);
+  if (t === 'heritiers') {
+    const calc = ['calc_nom', 'calc_enfant_de_fr', 'calc_enfant_de_en', 'calc_pantheon', 'calc_type'];
+    const slots = slotsSpheres(B);
+    const lignes = [...B.rows('heritiers')].sort((a, b) => a.id.localeCompare(b.id)).map(r => {
+      const H = heritierDepuisBase(B, r.id), e = B.get('entites', H.entite_id);
+      const v = { ...H };
+      slots.forEach((s, i) => { v[s.col] = H.spheres[i] ? H.spheres[i].sphere_id : ''; });
+      for (const [k, x] of Object.entries(H.stats)) v['stat_' + k] = x;
+      const c = { calc_nom: libId(B, 'noms', H.nom_id), calc_enfant_de_fr: enfantDeFr(e), calc_enfant_de_en: enfantDeEn(e), calc_pantheon: e ? libId(B, 'pantheons', e.pantheon_id) : '', calc_type: e ? libId(B, 'types_heritage', e.type_id) : '' };
+      return [...entetes.map(h => celluleTSV(v[h])), ...calc.map(h => c[h])];
+    });
+    return ecrireTSV([...entetes, ...calc], lignes);
+  }
+  const m = META[t], calcCols = m.calc ? Object.keys(m.calc({})) : [];
+  const lignes = B.trie(t).map(r => {
+    const E = versEdition(B, t, r), v = {};
+    for (const c of m.cols) {
+      if (c.t === 'pivot') for (const [k, x] of Object.entries(E[c.n] || {})) v[prefixePivot(c) + k] = x;
+      else if (c.t === 'poly') { v[c.tsvType] = E[c.n].type; v[c.tsvId] = E[c.n].id; }
+      else v[c.n] = E[c.n];
+    }
+    const calc = m.calc ? m.calc(r) : {};
+    return [...entetes.map(h => celluleTSV(v[h])), ...calcCols.map(h => calc[h])];
+  });
+  return ecrireTSV([...entetes, ...calcCols], lignes);
+}
+
+function echangeVersEdition(B, t, ligne, entetes) {
+  const m = META[t], has = h => entetes.includes(h), notes = [];
+  const cle = cleCols(t).map(c => ligne[c] ?? '').join('|');
+  const existe = cleCols(t).every(c => !vide(ligne[c])) ? B.get(t, cle) : null;
+  const E = existe ? versEdition(B, t, existe) : nouvelleEdition(t);
+  for (const c of m.cols) {
+    if (c.t === 'liste') { if (has(c.n)) E[c.n] = ligne[c.n].split('|').map(x => x.trim()).filter(Boolean); }
+    else if (c.t === 'pivot') {
+      const pre = prefixePivot(c);
+      for (const h of entetes) if (h.startsWith(pre)) { const k = h.slice(pre.length), v = lireNombre(ligne[h]); if (v === null) delete E[c.n][k]; else E[c.n][k] = v; }
+    } else if (c.t === 'poly') { if (has(c.tsvType) || has(c.tsvId)) E[c.n] = { type: ligne[c.tsvType] || '', id: ligne[c.tsvId] || '' }; }
+    else if (!has(c.n)) continue;
+    else if (c.t === 'bool') { const b = lireBool(ligne[c.n]); if (b === null) notes.push(`${c.l} : « ${ligne[c.n]} » n’est ni oui ni non.`); else E[c.n] = b; }
+    else if (c.t === 'entier' || c.t === 'nombre') E[c.n] = lireNombre(ligne[c.n]);
+    else E[c.n] = vide(ligne[c.n]) ? null : ligne[c.n];
+  }
+  return { E, ancienne: existe ? cle : null, notes };
+}
+function echangeVersHeritier(B, ligne, entetes) {
+  const has = h => entetes.includes(h), notes = [];
+  const existe = !vide(ligne.id) && B.get('heritiers', ligne.id);
+  const H = existe ? heritierDepuisBase(B, ligne.id) : heritierVide(B);
+  if (!vide(ligne.id)) H.id = ligne.id;
+  for (const c of COLS_HERITIER) {
+    if (c === 'id' || !has(c)) continue;
+    if (c === 'etalon') { const b = lireBool(ligne[c]); if (b === null) notes.push(`Étalon : « ${ligne[c]} » n’est ni oui ni non.`); else H.etalon = b; }
+    else H[c] = vide(ligne[c]) ? null : ligne[c];
+  }
+  if (vide(H.statut)) H.statut = 'brouillon';
+  slotsSpheres(B).forEach((s, i) => { if (has(s.col)) H.spheres[i] = { sphere_id: vide(ligne[s.col]) ? null : ligne[s.col], elevation_id: s.elev }; });
+  for (const h of entetes) if (h.startsWith('stat_')) { const k = h.slice(5), v = lireNombre(ligne[h]); if (v === null) delete H.stats[k]; else H.stats[k] = v; }
+  return { H, existe: !!existe, notes };
+}
+
+// Forme comparable d’une édition : listes triées, clés d’objets triées, dates ignorées.
+function normaliser(o) {
+  const n = v => {
+    if (Array.isArray(v)) { const m = v.map(n); return m.every(x => typeof x !== 'object' || x === null) ? [...m].sort() : m; }
+    if (v && typeof v === 'object') return Object.fromEntries(Object.keys(v).filter(k => !['cree_le', 'modifie_le'].includes(k)).sort().map(k => [k, n(v[k])]));
+    return v === undefined ? null : v;
+  };
+  return JSON.stringify(n(o));
+}
+/* Simule un import complet sur une copie de la base, sans rien écrire. */
+function simulerImport(lots) {
+  const B = BASE.clone(), compteurs = copie(DEPOT.compteurs), rapport = [], ops = [];
+  const tries = [...lots].sort((a, b) => TOUTES.indexOf(a.table) - TOUTES.indexOf(b.table));
+  for (const lot of tries) {
+    const r = { fichier: lot.fichier, table: lot.table, crees: 0, maj: 0, inchanges: 0, refus: [], avertissements: [] };
+    const connues = new Set(lot.table === 'heritiers' ? entetesTable(B, 'heritiers') : entetesTable(B, lot.table));
+    const inconnues = lot.entetes.filter(h => h && !connues.has(h) && !h.startsWith('calc_') && !(lot.table === 'heritiers' && h.startsWith('stat_')) && !h.startsWith('profil_') && !h.startsWith('p_'));
+    if (inconnues.length) r.avertissements.push(`Colonnes ignorées : ${inconnues.join(', ')}.`);
+    lot.lignes.forEach((ligne, i) => {
+      const num = i + 2;
+      if (lot.table === 'heritiers') {
+        const { H, existe, notes } = echangeVersHeritier(B, ligne, lot.entetes);
+        const errs = [...notes, ...validerHeritier(B, H).filter(x => x.niv === 'erreur').map(x => x.msg)];
+        if (errs.length) { r.refus.push({ ligne: num, id: ligne.id || '', raisons: errs }); return; }
+        if (existe && normaliser(heritierDepuisBase(B, H.id)) === normaliser(H)) { r.inchanges++; return; }
+        const envoi = copie(H);
+        const id = appliquerHeritier(B, H, { compteurs });
+        ops.push({ table: 'heritiers', H: envoi, nouveau: !existe, cle: id });
+        existe ? r.maj++ : r.crees++;
+        return;
+      }
+      const { E, ancienne, notes } = echangeVersEdition(B, lot.table, ligne, lot.entetes);
+      const errs = [...notes, ...validerEdition(B, lot.table, E, ancienne)];
+      if (errs.length) { r.refus.push({ ligne: num, id: cleCols(lot.table).map(c => ligne[c] || '').join(' / '), raisons: errs }); return; }
+      if (ancienne && normaliser(versEdition(B, lot.table, B.get(lot.table, ancienne))) === normaliser(E)) { r.inchanges++; return; }
+      const { row, jonctions } = depuisEdition(lot.table, E);
+      const envoi = copie(row);
+      const final = appliquerLigne(B, lot.table, row, jonctions, ancienne, { compteurs });
+      ops.push({ table: lot.table, row: envoi, jonctions: copie(jonctions), ancienne, nouveau: !ancienne, cle: cleDe(lot.table, final) });
+      ancienne ? r.maj++ : r.crees++;
+    });
+    rapport.push(r);
+  }
+  return { B, compteurs, rapport, ops, ok: rapport.every(r => !r.refus.length) };
+}
+async function appliquerImport(sim, progression) {
+  if (!sim.ok) throw new ErreurForge('L’import contient des lignes refusées.');
+  if (DEPOT.mode === 'local') {
+    BASE = sim.B; DEPOT.compteurs = sim.compteurs;
+    for (const op of sim.ops) Local.noter({ table_nom: op.table, ligne_id: op.cle, operation: op.nouveau ? 'INSERT' : 'UPDATE', champs: ['import'] });
+    Local.persister();
+    return;
+  }
+  const simples = t => META[t] && !META[t].cols.some(c => c.t === 'liste' || c.t === 'pivot');
+  let fait = 0;
+  const total = sim.ops.length;
+  for (const t of TOUTES) {
+    const ops = sim.ops.filter(o => o.table === t);
+    if (!ops.length) continue;
+    if (t === 'heritiers') {
+      for (const o of ops) { await Supa.heritier(o.H); progression && progression(++fait, total); }
+      continue;
+    }
+    if (simples(t)) {
+      const avecCle = ops.filter(o => !vide(o.row.id) || CLES[t]).map(o => Object.fromEntries(colonnesDB(t).map(c => [c, o.row[c] ?? null])));
+      const sansCle = ops.filter(o => vide(o.row.id) && !CLES[t]).map(o => { const r = Object.fromEntries(colonnesDB(t).map(c => [c, o.row[c] ?? null])); delete r.id; return r; });
+      for (let a = 0; a < avecCle.length; a += 500) {
+        const { error } = await DEPOT.client.from(t).upsert(avecCle.slice(a, a + 500), { onConflict: cleCols(t).join(',') });
+        if (error) throw erreurSupa(error, TITRES[t]);
+        fait += Math.min(500, avecCle.length - a); progression && progression(fait, total);
+      }
+      for (let a = 0; a < sansCle.length; a += 500) {
+        const { error } = await DEPOT.client.from(t).insert(sansCle.slice(a, a + 500));
+        if (error) throw erreurSupa(error, TITRES[t]);
+        fait += Math.min(500, sansCle.length - a); progression && progression(fait, total);
+      }
+      continue;
+    }
+    for (const o of ops) {
+      const saved = await Supa.ligne(t, o.row, o.jonctions, o.ancienne);
+      appliquerLigne(BASE, t, saved, o.jonctions, o.ancienne);
+      progression && progression(++fait, total);
+    }
+  }
+}
+
+/* ── Build JSON pour le jeu publié (P19) ── */
+function preparerBuild(B, version) {
+  const hs = B.rows('heritiers').filter(h => h.statut === 'en_jeu');
+  const erreurs = [];
+  for (const h of hs) {
+    const errs = validerHeritier(B, heritierDepuisBase(B, h.id)).filter(x => x.niv === 'erreur');
+    if (errs.length) erreurs.push(`${h.id} ${libHeritier(B, h)} : ${errs.map(x => x.msg).join(' ')}`);
+  }
+  const ids = {};
+  const ajoute = (t, id) => { if (!vide(id)) (ids[t] = ids[t] || new Set()).add(id); };
+  const H = hs.map(h => heritierDepuisBase(B, h.id));
+  for (const h of H) {
+    ajoute('entites', h.entite_id); ajoute('noms', h.nom_id); ajoute('vocations', h.vocation_id); ajoute('ciblages', h.ciblage_id);
+    for (const [c] of CHAMPS_POUVOIRS) ajoute('pouvoirs', h[c]);
+    for (const s of h.spheres) ajoute('spheres', s.sphere_id);
+  }
+  for (const e of ids.entites || []) { const r = B.get('entites', e); if (r) { ajoute('pantheons', r.pantheon_id); ajoute('types_heritage', r.type_id); for (const s of B.liste(LS_ENTITE, e)) ajoute('spheres', s); } }
+  const effets = B.rows('effets').filter(e => (ids.pouvoirs || new Set()).has(e.pouvoir_id));
+  for (const p of ids.pouvoirs || []) { const r = B.get('pouvoirs', p); if (r) { ajoute('spheres', r.sphere_id); ajoute('declencheurs', r.declencheur_id); } }
+  for (const e of effets) { ajoute('types_effet', e.type_effet_id); ajoute('ciblages', e.ciblage_id); }
+  const net = r => { const o = { ...r }; delete o.cree_le; delete o.modifie_le; delete o.statut; delete o.notes; delete o.etalon; return o; };
+  const choisis = t => B.trie(t).filter(r => ids[t] && ids[t].has(r.id)).map(net);
+  const modifs = B.rows('modificateurs').filter(m => vide(m.pouvoir_id) || (ids.pouvoirs || new Set()).has(m.pouvoir_id));
+  const donnees = {
+    format: 'ichor-donnees', version, genere_le: maintenant(), langues: ['fr', 'en'],
+    elevations: B.trie('elevations').map(net), ecarts_elevation: B.rows('ecarts_elevation').map(net),
+    pantheons: choisis('pantheons'), types_heritage: choisis('types_heritage'),
+    entites: choisis('entites').map(e => ({ ...e, enfant_de_fr: enfantDeFr(e), enfant_de_en: enfantDeEn(e), spheres: B.liste(LS_ENTITE, e.id) })),
+    noms: choisis('noms'), spheres: choisis('spheres'), vocations: choisis('vocations').map(v => ({ ...v, profil: B.pivot(PV_VOCATION, v.id) })),
+    stats: B.trie('stats').map(net), ciblages: B.trie('ciblages').map(net), declencheurs: choisis('declencheurs'),
+    pouvoirs: choisis('pouvoirs'),
+    effets: effets.map(e => ({ ...net(e), etiquettes: B.liste(colDef('effets', 'etiquettes'), e.id), parametres: B.pivot(colDef('effets', 'p'), e.id) })),
+    types_effet: B.trie('types_effet').map(net), parametres_effet: B.trie('parametres_effet').map(net), etiquettes: B.trie('etiquettes').map(net),
+    synergies: B.trie('synergies').map(net), synergie_paliers: B.rows('synergie_paliers').map(net), modificateurs: modifs.map(net),
+    constantes: B.trie('constantes').map(net),
+    heritiers: H.map(h => ({ id: h.id, elevation_depart_id: h.elevation_depart_id, entite_id: h.entite_id, nom_id: h.nom_id, vocation_id: h.vocation_id,
+      ciblage_id: h.ciblage_id, passif_id: h.passif_id, pouvoir_1_id: h.pouvoir_1_id, pouvoir_2_id: h.pouvoir_2_id, ultime_id: h.ultime_id,
+      spheres: h.spheres.filter(s => s.sphere_id), stats: h.stats })),
+  };
+  return { erreurs, donnees, nb: hs.length };
+}
+
+/* ── Contrôles du registre (P9) ── */
+function controlesRegistre(B) {
+  const hs = B.rows('heritiers');
+  const invalides = [], incomplets = [];
+  for (const h of hs) {
+    const v = validerHeritier(B, heritierDepuisBase(B, h.id));
+    if (v.some(x => x.niv === 'erreur')) invalides.push({ h, msgs: v.filter(x => x.niv === 'erreur').map(x => x.msg) });
+    else if (v.some(x => x.niv === 'afaire')) incomplets.push({ h, msgs: v.filter(x => x.niv === 'afaire').map(x => x.msg) });
+  }
+  const proches = [], actifs = hs.filter(h => h.statut !== 'retire');
+  for (let i = 0; i < actifs.length; i++) for (let j = i + 1; j < actifs.length; j++) {
+    const a = actifs[i], b = actifs[j];
+    const pa = new Set(CHAMPS_POUVOIRS.map(([c]) => a[c]).filter(Boolean));
+    const communs = CHAMPS_POUVOIRS.map(([c]) => b[c]).filter(x => x && pa.has(x));
+    if (communs.length >= 3) proches.push({ a, b, n: communs.length });
+  }
+  const utilises = new Set(hs.flatMap(h => CHAMPS_POUVOIRS.map(([c]) => h[c])));
+  const inutilises = {
+    pouvoirs: B.trie('pouvoirs').filter(p => !utilises.has(p.id)),
+    spheresSansPouvoir: B.trie('spheres').filter(s => !B.rows('pouvoirs').some(p => p.sphere_id === s.id)),
+    spheresNonHeritables: B.trie('spheres').filter(s => !B.rows('entite_spheres').some(x => x.sphere_id === s.id)),
+    entitesSansSphere: B.trie('entites').filter(e => !B.liste(LS_ENTITE, e.id).length),
+    vocationsSansProfil: B.trie('vocations').filter(v => !Object.keys(B.pivot(PV_VOCATION, v.id)).length),
+    statsSansReference: B.trie('stats').filter(s => vide(s.valeur_ref)),
+  };
+  const traductions = [];
+  for (const t of Object.keys(META)) {
+    const cols = META[t].cols.filter(c => c.en);
+    if (!cols.length) continue;
+    const n = B.rows(t).filter(r => cols.some(c => { const fr = r[c.n.replace(/_en$/, '_fr')]; return !vide(fr) && vide(r[c.n]); })).length;
+    if (n) traductions.push({ t, n });
+  }
+  return { invalides, incomplets, proches, inutilises, traductions };
+}
+
+
+'use strict';
+/* ═══════════════════════════════════════════════════════════════
+   Forge d’Ichor · interface
+   ═══════════════════════════════════════════════════════════════ */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const ICO = {
+  de: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="1.5" width="13" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="5" cy="5" r="1.2" fill="currentColor"/><circle cx="11" cy="11" r="1.2" fill="currentColor"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/></svg>',
+  cadenas: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7.5" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
+  ouvert: '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5 7V5a3 3 0 0 1 5.8-1" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>',
+  plus: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8"/></svg>',
+  etincelle: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l1.6 4.4L14 7l-4.4 1.6L8 13l-1.6-4.4L2 7l4.4-1.6z" fill="currentColor"/></svg>',
+  disque: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 2.5h9l2 2v9h-11z" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="5" y="2.5" width="5" height="3.5" fill="currentColor"/><rect x="4.5" y="9" width="7" height="4.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>',
+  bas: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v9M4 7.5 8 11l4-3.5M3 14h10" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
+  haut: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 11V2M4 5.5 8 2l4 3.5M3 14h10" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
+};
+const STATUT_LIB = Object.fromEntries(STATUTS);
+const EMP_LIB = { passif: 'Passif', pouvoir: 'Pouvoir', ultime: 'Ultime' };
+const EDITION_CLE = 'forge-ichor-edition';
+
+const UI = {
+  vue: 'forge', occupe: null, toasts: [],
+  F: { h: null, verrous: {}, contraintes: {}, filtres: { pantheon: '', type: '' }, genre: '', reference: '', erreurs: null, ajoutNom: null },
+  HX: { q: '', statut: '', elevation: '', pantheon: '', vocation: '', confirm: null, ouvrir: null },
+  L: { table: 'pantheons', q: '', cle: null, E: null, erreurs: [], confirm: false, retour: null },
+  X: { lots: [], sim: null, progression: '', version: null, build: null },
+  J: { entrees: null, erreur: null },
+  R: { url: 'https://xapxmofadghpuoxlgfqy.supabase.co', cle: '', email: '', mdp: '', msg: null, confirmVider: false, montrerCle: false },
+};
+
+/* ── Petits composants ── */
+function options(liste, val, libVide) {
+  let h = libVide !== undefined ? `<option value="">${esc(libVide)}</option>` : '', g;
+  for (const o of liste) {
+    if (o.g !== g) { if (g) h += '</optgroup>'; g = o.g; if (g) h += `<optgroup label="${esc(g)}">`; }
+    h += `<option value="${esc(o.v)}"${o.v === val ? ' selected' : ''}${o.dis ? ' disabled' : ''}>${esc(o.l)}</option>`;
+  }
+  if (g) h += '</optgroup>';
+  if (!vide(val) && !liste.some(o => o.v === val)) h += `<option value="${esc(val)}" selected>${esc(val)} (hors des choix possibles)</option>`;
+  return h;
+}
+const couleurDe = (t, id) => { const r = BASE.get(t, id); return r && r.couleur ? r.couleur : ''; };
+const puceSphere = (id, suffixe = '') => { const c = couleurDe('spheres', id); return `<span class="puce"${c ? ` style="--c:${c}"` : ''}>${esc(libId(BASE, 'spheres', id))}${suffixe}</span>`; };
+function badgeElev(id) {
+  const e = BASE.get('elevations', id);
+  if (!e) return '';
+  return `<span class="elev e${Math.min(e.ordre, 4)}"><span class="pips" aria-hidden="true">${'◆'.repeat(e.ordre)}</span>${esc(e.nom_fr)}</span>`;
+}
+const elevTriees = () => BASE.trie('elevations');
+function notifier(texte, type = 'ok') {
+  const t = { id: Math.random(), texte, type };
+  UI.toasts.push(t);
+  rendreToasts();
+  setTimeout(() => { UI.toasts = UI.toasts.filter(x => x !== t); rendreToasts(); }, type === 'erreur' ? 7000 : 3200);
+}
+function rendreToasts() { $('#toasts').innerHTML = UI.toasts.map(t => `<div class="toast ${t.type}" role="status">${esc(t.texte)}</div>`).join(''); }
+const messagesErreur = e => (e instanceof ErreurForge ? e.messages : [e && e.message ? e.message : String(e)]);
+async function occuper(msg, fn) {
+  UI.occupe = msg; rendreVoile();
+  try { return await fn(); } finally { UI.occupe = null; rendreVoile(); }
+}
+function rendreVoile() { const v = $('#voile'); v.hidden = !UI.occupe; v.innerHTML = UI.occupe ? `<div role="status">${esc(UI.occupe)}</div>` : ''; }
+function telecharger(nom, contenu, type = 'text/tab-separated-values;charset=utf-8') {
+  const url = URL.createObjectURL(contenu instanceof Blob ? contenu : new Blob([contenu], { type }));
+  const a = document.createElement('a');
+  a.href = url; a.download = nom; document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+/* ═════════════ Forge ═════════════ */
+const F = () => UI.F;
+function ajusterSpheres(h) {
+  const slots = slotsSpheres(BASE);
+  h.spheres = slots.map((s, i) => ({ sphere_id: (h.spheres && h.spheres[i] && h.spheres[i].sphere_id) || null, elevation_id: s.elev }));
+  return slots;
+}
+function forgeNeuve() {
+  const f = F();
+  f.h = heritierVide(BASE); f.verrous = {}; f.contraintes = {}; f.erreurs = null; f.ajoutNom = null;
+  f.reference = normaliser(f.h);
+}
+const forgeModifiee = () => normaliser(F().h) !== F().reference;
+function sauverEdition() {
+  clearTimeout(sauverEdition.t);
+  sauverEdition.t = setTimeout(() => {
+    try { localStorage.setItem(EDITION_CLE, JSON.stringify({ h: F().h, verrous: F().verrous, contraintes: F().contraintes, filtres: F().filtres, genre: F().genre, reference: F().reference })); } catch (e) { /* stockage indisponible */ }
+  }, 300);
+}
+function restaurerEdition() {
+  try {
+    const o = JSON.parse(localStorage.getItem(EDITION_CLE) || 'null');
+    if (o && o.h) Object.assign(F(), { h: o.h, verrous: o.verrous || {}, contraintes: o.contraintes || {}, filtres: o.filtres || { pantheon: '', type: '' }, genre: o.genre || '', reference: o.reference || '' });
+  } catch (e) { /* édition illisible */ }
+  if (!F().h) forgeNeuve();
+  ajusterSpheres(F().h);
+}
+function ouvrirHeritier(id, copier) {
+  const H = heritierDepuisBase(BASE, id);
+  if (!H) return;
+  const f = F();
+  f.h = H; f.erreurs = null; f.ajoutNom = null; f.filtres = { pantheon: '', type: '' };
+  ajusterSpheres(f.h);
+  f.reference = normaliser(f.h);
+  if (copier) { f.h.id = null; f.h.statut = 'brouillon'; f.h.nom_id = null; f.h.etalon = false; f.reference = ''; }
+  UI.vue = 'forge';
+  sauverEdition();
+}
+// Par défaut, seule la sphère de départ est limitée à l’héritage ; la règle demande au moins une sphère héritée.
+const contrainteDe = i => (F().contraintes[i] !== undefined ? F().contraintes[i] : i === 0);
+const spheresHeritees = h => (h.entite_id ? BASE.liste(LS_ENTITE, h.entite_id) : []);
+function nomsCompatibles(h, genre) {
+  const ent = BASE.get('entites', h.entite_id);
+  const pris = new Set(BASE.rows('heritiers').filter(x => x.id !== h.id && x.statut !== 'retire' && x.entite_id === h.entite_id).map(x => x.nom_id));
+  return BASE.trie('noms').filter(n => (!ent || origineAcceptee(BASE, n.origine_id, ent.pantheon_id)) && (!genre || n.genre === genre) && !pris.has(n.id));
+}
+function autoPossible() {
+  const st = BASE.rows('stats').filter(s => !vide(s.valeur_ref));
+  if (!st.length) return { ok: false, raison: 'Aucune stat n’a de valeur de référence (Listes › Statistiques).' };
+  return { ok: true };
+}
+// Auto provisoire, en attendant l’IP : valeur de référence × poids du profil de la vocation (moyenne des poids = 1).
+function appliquerAuto(h) {
+  const st = BASE.trie('stats').filter(s => !vide(s.valeur_ref));
+  const prof = h.vocation_id ? BASE.pivot(PV_VOCATION, h.vocation_id) : {};
+  const poids = st.map(s => prof[s.id]).filter(x => !vide(x));
+  const moy = poids.length ? poids.reduce((a, b) => a + b, 0) / poids.length : 1;
+  for (const s of st) {
+    const w = vide(prof[s.id]) || !(moy > 0) ? 1 : prof[s.id] / moy;
+    let v = s.valeur_ref * w;
+    if (!vide(s.min)) v = Math.max(s.min, v);
+    if (!vide(s.max)) v = Math.min(s.max, v);
+    h.stats[s.id] = arrondi(v);
+  }
+}
+function generer(champs) {
+  const B = BASE, f = F(), h = f.h;
+  const doit = k => (champs ? champs.includes(k) : !f.verrous[k]);
+  const slots = ajusterSpheres(h);
+  if (doit('elevation')) h.elevation_depart_id = (piocher(B.rows('elevations')) || {}).id || null;
+  if (doit('entite')) {
+    const c = B.rows('entites').filter(e => (!f.filtres.pantheon || e.pantheon_id === f.filtres.pantheon) && (!f.filtres.type || e.type_id === f.filtres.type) && B.liste(LS_ENTITE, e.id).length);
+    h.entite_id = (piocher(c) || {}).id || null;
+  }
+  const herit = spheresHeritees(h);
+  const prises = new Set(h.spheres.filter((s, i) => !doit('sphere:' + i) && s.sphere_id).map(s => s.sphere_id));
+  slots.forEach((s, i) => {
+    if (!doit('sphere:' + i)) return;
+    const pool = (contrainteDe(i) ? herit : B.rows('spheres').map(x => x.id)).filter(x => !prises.has(x));
+    h.spheres[i].sphere_id = piocher(pool);
+    if (h.spheres[i].sphere_id) prises.add(h.spheres[i].sphere_id);
+  });
+  if (herit.length && !h.spheres.some(s => herit.includes(s.sphere_id))) {
+    const i = h.spheres.findIndex((s, j) => doit('sphere:' + j));
+    const pool = herit.filter(x => !h.spheres.some(s => s.sphere_id === x));
+    if (i >= 0 && pool.length) h.spheres[i].sphere_id = piocher(pool);
+  }
+  const ens = new Set(h.spheres.map(s => s.sphere_id).filter(Boolean));
+  const tirerPouvoir = (champ, emp, exclus) => {
+    const pool = B.rows('pouvoirs').filter(p => p.emplacement === emp && ens.has(p.sphere_id) && p.id !== exclus);
+    h[champ] = (piocher(pool) || {}).id || null;
+  };
+  if (doit('passif')) tirerPouvoir('passif_id', 'passif');
+  if (doit('pouvoir_1')) tirerPouvoir('pouvoir_1_id', 'pouvoir', h.pouvoir_2_id);
+  if (doit('pouvoir_2')) tirerPouvoir('pouvoir_2_id', 'pouvoir', h.pouvoir_1_id);
+  if (doit('ultime')) tirerPouvoir('ultime_id', 'ultime');
+  if (doit('vocation')) h.vocation_id = (piocher(B.rows('vocations')) || {}).id || null;
+  if (doit('ciblage')) h.ciblage_id = (piocher(B.rows('ciblages').filter(c => c.camp === 'ennemi')) || {}).id || null;
+  if (doit('nom')) h.nom_id = (piocher(nomsCompatibles(h, f.genre)) || {}).id || null;
+  if (doit('stats') && autoPossible().ok) appliquerAuto(h);
+}
+const outils = (k, sansDe) => `<span class="outils">${sansDe ? '' : `<button class="ic" data-a="f-de" data-k="${k}" title="Tirer au sort" aria-label="Tirer au sort" data-focus="d-${k}">${ICO.de}</button>`}${btnVerrou(k)}</span>`;
+function btnVerrou(k) {
+  const on = !!F().verrous[k];
+  return `<button class="ic${on ? ' actif' : ''}" data-a="f-verrou" data-k="${k}" aria-pressed="${on}" title="${on ? 'Verrouillé : la génération n’y touche pas' : 'Verrouiller'}" aria-label="Verrouiller" data-focus="v-${k}">${on ? ICO.cadenas : ICO.ouvert}</button>`;
+}
+
+function vueForge() {
+  const B = BASE, f = F(), h = f.h;
+  if (DEPOT.mode === 'supabase' && !DEPOT.pret) return bandeauConnexion();
+  const slots = ajusterSpheres(h);
+  const ent = B.get('entites', h.entite_id), herit = spheresHeritees(h);
+  const manquent = [];
+  if (!B.rows('entites').length) manquent.push('des entités parentes et leurs sphères héritables');
+  if (!B.rows('pouvoirs').length) manquent.push('des pouvoirs');
+  if (!B.rows('noms').length) manquent.push('des noms');
+  if (!B.rows('vocations').length) manquent.push('des vocations');
+
+  const elevs = elevTriees();
+  const secElev = `<section class="bloc"><div class="bloc-tete"><h2>Élévation de départ</h2><span class="espace"></span>${outils('elevation')}</div>
+    <div class="seg" role="group" aria-label="Élévation de départ">${elevs.map(e => `<button data-a="f-elev" data-v="${esc(e.id)}" aria-pressed="${h.elevation_depart_id === e.id}" data-focus="el-${esc(e.id)}">${badgeElev(e.id)}</button>`).join('')}</div></section>`;
+
+  const pantheons = B.trie('pantheons'), types = B.trie('types_heritage');
+  const entOpts = B.trie('entites').filter(e => (!f.filtres.pantheon || e.pantheon_id === f.filtres.pantheon) && (!f.filtres.type || e.type_id === f.filtres.type))
+    .map(e => ({ v: e.id, l: `${e.nom_fr}${B.liste(LS_ENTITE, e.id).length ? '' : ' (aucune sphère héritable)'}`, g: `${libId(B, 'pantheons', e.pantheon_id)} · ${libId(B, 'types_heritage', e.type_id)}` }))
+    .sort((a, b) => a.g.localeCompare(b.g, 'fr') || a.l.localeCompare(b.l, 'fr'));
+  const secHer = `<section class="bloc"><div class="bloc-tete"><h2>Héritage</h2><span class="aide">Panthéon et type filtrent les entités ; seule l’entité est enregistrée.</span></div>
+    <div class="deux">
+      <label class="champ"><span>Panthéon</span><select data-c="f-filtre" data-k="pantheon" data-focus="fp">${options(pantheons.map(p => ({ v: p.id, l: p.nom_fr })), f.filtres.pantheon, 'Tous')}</select></label>
+      <label class="champ"><span>Type</span><select data-c="f-filtre" data-k="type" data-focus="ft">${options(types.map(t => ({ v: t.id, l: t.nom_fr })), f.filtres.type, 'Tous')}</select></label>
+    </div>
+    <div class="rangee"><label for="f-entite">Entité parente</label><select id="f-entite" data-c="f-champ" data-k="entite_id" data-focus="fe">${options(entOpts, h.entite_id, 'Choisir…')}</select>${outils('entite')}
+      ${ent ? `<div class="sous-ligne"><span>${esc(enfantDeFr(ent))} · <i>${esc(enfantDeEn(ent))}</i></span><span class="puces">${herit.map(s => puceSphere(s)).join('') || '<span class="note">Aucune sphère héritable</span>'}</span></div>` : ''}
+    </div></section>`;
+
+  const toutes = B.trie('spheres');
+  const secSph = `<section class="bloc"><div class="bloc-tete"><h2>Sphères</h2><span class="aide">Au moins une sphère héritée de l’entité.</span></div>
+    ${slots.map((s, i) => {
+      const contrainte = contrainteDe(i);
+      const autres = new Set(h.spheres.filter((x, j) => j !== i && x.sphere_id).map(x => x.sphere_id));
+      const base = contrainte ? toutes.filter(x => herit.includes(x.id)) : toutes;
+      const opts = base.map(x => ({ v: x.id, l: x.nom_fr + (!contrainte && herit.includes(x.id) ? ' · héritée' : ''), dis: autres.has(x.id) }));
+      const e = B.get('elevations', s.elev);
+      return `<div class="slot"><span class="slot-elev">${i === 0 ? '<span class="lib">Départ</span>' : `<span class="lib">${badgeElev(s.elev)}</span>`}</span>
+        <select data-c="f-sphere" data-i="${i}" aria-label="Sphère ${i + 1}" data-focus="s-${i}">${options(opts, h.spheres[i].sphere_id, contrainte && !ent ? 'Choisis d’abord une entité' : 'Choisir…')}</select>
+        <label class="bascule"><input type="checkbox" data-c="f-contrainte" data-i="${i}" ${contrainte ? 'checked' : ''} data-focus="c-${i}"> Héritage seulement</label>
+        ${outils('sphere:' + i)}</div>${e && i > 0 ? '' : ''}`;
+    }).join('')}
+    ${elevs.filter(e => e.spheres_libres > 0).map(e => `<p class="aide" style="font-size:13px;color:var(--brume)">En ${esc(e.nom_fr)}, le joueur choisira ${e.spheres_libres} sphère${e.spheres_libres > 1 ? 's' : ''} de plus en jeu.</p>`).join('')}
+  </section>`;
+
+  const sph = h.spheres.filter(s => s.sphere_id);
+  const elevDep = ordreElev(B, h.elevation_depart_id);
+  const optsPouvoir = (emp, exclus) => sph.flatMap(s => B.trie('pouvoirs').filter(p => p.emplacement === emp && p.sphere_id === s.sphere_id)
+    .map(p => ({ v: p.id, l: p.nom_fr + (p.statut === 'brouillon' ? ' (brouillon)' : ''), g: `${libId(B, 'spheres', s.sphere_id)} · ${libId(B, 'elevations', s.elevation_id)}`, dis: p.id === exclus })));
+  const metaPouvoir = p => {
+    if (!p) return '';
+    const bits = [puceSphere(p.sphere_id)];
+    if (p.emplacement === 'passif') bits.push(`Déclencheur : ${esc(libId(B, 'declencheurs', p.declencheur_id))}${vide(p.declencheur_valeur) ? '' : ' ' + nombreFr(p.declencheur_valeur) + ' ' + esc((B.get('declencheurs', p.declencheur_id) || {}).unite_valeur || '')}`);
+    if (p.emplacement === 'pouvoir') bits.push(`Recharge ${nombreFr(p.recharge_s)} s`);
+    if (p.emplacement === 'ultime') bits.push(`Énergie ${nombreFr(p.energie_requise)}`);
+    const s = h.spheres.find(x => x.sphere_id === p.sphere_id);
+    if (s && ordreElev(B, s.elevation_id) > elevDep) bits.push(`<span class="note">Actif sans le bonus de sa sphère avant ${esc(libId(B, 'elevations', s.elevation_id))}</span>`);
+    return `<div class="sous-ligne">${bits.join('')}</div>`;
+  };
+  const rangPouvoir = (champ, k, emp, lib, exclus) => `<div class="rangee"><label for="f-${k}">${lib}</label>
+    <select id="f-${k}" data-c="f-champ" data-k="${champ}" data-focus="${k}">${options(optsPouvoir(emp, exclus), h[champ], sph.length ? 'Choisir…' : 'Choisis d’abord les sphères')}</select>${outils(k)}${metaPouvoir(B.get('pouvoirs', h[champ]))}</div>`;
+  const secPouv = `<section class="bloc"><div class="bloc-tete"><h2>Pouvoirs</h2><span class="aide">Seuls les pouvoirs des sphères de l’Héritier sont proposés.</span></div>
+    ${rangPouvoir('passif_id', 'passif', 'passif', 'Passif')}
+    ${rangPouvoir('pouvoir_1_id', 'pouvoir_1', 'pouvoir', 'Pouvoir 1', h.pouvoir_2_id)}
+    ${rangPouvoir('pouvoir_2_id', 'pouvoir_2', 'pouvoir', 'Pouvoir 2', h.pouvoir_1_id)}
+    ${rangPouvoir('ultime_id', 'ultime', 'ultime', 'Ultime')}</section>`;
+
+  const voc = B.get('vocations', h.vocation_id), profil = voc ? B.pivot(PV_VOCATION, voc.id) : {};
+  const secVoc = `<section class="bloc"><div class="bloc-tete"><h2>Vocation et ciblage</h2></div>
+    <div class="rangee"><label for="f-voc">Vocation</label><select id="f-voc" data-c="f-champ" data-k="vocation_id" data-focus="voc">${options(B.trie('vocations').map(v => ({ v: v.id, l: v.nom_fr })), h.vocation_id, 'Choisir…')}</select>${outils('vocation')}
+      ${voc && Object.keys(profil).length ? `<div class="sous-ligne">Profil : ${Object.entries(profil).map(([k, v]) => `${esc((B.get('stats', k) || {}).abreviation_fr || k)} ${nombreFr(v)}`).join(' · ')}</div>` : ''}</div>
+    <div class="rangee"><label for="f-cib">Ciblage favori</label><select id="f-cib" data-c="f-champ" data-k="ciblage_id" data-focus="cib">${options(B.trie('ciblages').filter(c => c.camp === 'ennemi').map(c => ({ v: c.id, l: c.nom_fr })), h.ciblage_id, 'Choisir…')}</select>${outils('ciblage')}
+      ${B.get('ciblages', h.ciblage_id) && B.get('ciblages', h.ciblage_id).description_fr ? `<div class="sous-ligne">${esc(B.get('ciblages', h.ciblage_id).description_fr)}</div>` : ''}</div></section>`;
+
+  const noms = nomsCompatibles(h, f.genre);
+  const nom = B.get('noms', h.nom_id);
+  const origCompat = ent ? B.trie('origines').filter(o => origineAcceptee(B, o.id, ent.pantheon_id)) : B.trie('origines');
+  const secNom = `<section class="bloc"><div class="bloc-tete"><h2>Nom</h2><span class="aide">${ent ? `Origines acceptées par le panthéon ${esc(libId(B, 'pantheons', ent.pantheon_id))} et origine Commune.` : 'Choisis l’entité pour filtrer les noms.'}</span></div>
+    <div class="seg petit" role="group" aria-label="Genre du nom">${[['', 'Tous'], ['M', 'Masculin'], ['F', 'Féminin'], ['E', 'Épicène']].map(([v, l]) => `<button data-a="f-genre" data-v="${v}" aria-pressed="${f.genre === v}">${l}</button>`).join('')}</div>
+    <div class="rangee"><label for="f-nom">Nom</label><select id="f-nom" data-c="f-champ" data-k="nom_id" data-focus="nom">${options(noms.map(n => ({ v: n.id, l: `${n.nom} · ${n.genre}`, g: libId(B, 'origines', n.origine_id) })).sort((a, b) => a.g.localeCompare(b.g, 'fr')), h.nom_id, noms.length ? 'Choisir…' : 'Aucun nom disponible')}</select>${outils('nom')}
+      <div class="sous-ligne">${nom ? `${esc(libId(B, 'origines', nom.origine_id))} · ${nom.genre === 'M' ? 'masculin' : nom.genre === 'F' ? 'féminin' : 'épicène'}` : ''}<button class="btn discret" data-a="f-nom-ajout" data-focus="nomaj">${ICO.plus} Nouveau nom</button></div></div>
+    ${f.ajoutNom ? `<div class="ajout-nom">
+      <input type="text" id="an-nom" placeholder="Nom" value="${esc(f.ajoutNom.nom)}" data-i="f-an" data-k="nom" aria-label="Nouveau nom">
+      <select id="an-orig" data-c="f-an" data-k="origine_id" aria-label="Origine">${options(origCompat.map(o => ({ v: o.id, l: o.nom_fr })), f.ajoutNom.origine_id, 'Origine…')}</select>
+      <select id="an-genre" data-c="f-an" data-k="genre" aria-label="Genre">${options([['M', 'Masculin'], ['F', 'Féminin'], ['E', 'Épicène']].map(([v, l]) => ({ v, l })), f.ajoutNom.genre, 'Genre…')}</select>
+      <button class="btn" data-a="f-nom-creer">Ajouter</button></div>` : ''}
+  </section>`;
+
+  const stats = B.trie('stats'), ap = autoPossible();
+  const secStats = `<section class="bloc"><div class="bloc-tete"><h2>Statistiques</h2><span class="aide">Une seule série ; l’élévation agit par modificateurs.</span><span class="espace"></span>
+      <button class="btn" data-a="f-auto" ${ap.ok ? '' : 'disabled'} title="${esc(ap.ok ? 'Valeur de référence × poids du profil de la vocation (provisoire, en attendant l’IP)' : ap.raison)}">${ICO.etincelle} Auto</button>${btnVerrou('stats')}</div>
+    ${ap.ok ? '' : `<p style="font-size:13px;color:var(--brume)">${esc(ap.raison)}</p>`}
+    <div class="stats-grille">${stats.map(s => {
+      const v = h.stats[s.id], hors = !vide(v) && Number.isFinite(v) && ((!vide(s.min) && v < s.min) || (!vide(s.max) && v > s.max));
+      return `<label class="stat-champ${hors ? ' alerte' : ''}"><span><b>${esc(s.abreviation_fr || s.id)}</b>${esc(s.nom_fr)}${s.unite ? ' · ' + esc(s.unite) : ''}</span>
+        <input type="text" inputmode="decimal" value="${esc(nombreFr(v))}" data-i="f-stat" data-k="${esc(s.id)}" data-focus="st-${esc(s.id)}" placeholder="${vide(s.valeur_ref) ? '' : esc(nombreFr(s.valeur_ref))}"></label>`;
+    }).join('')}</div></section>`;
+
+  const secStatut = `<section class="bloc"><div class="bloc-tete"><h2>Statut et notes</h2></div>
+    <div class="deux"><label class="champ"><span>Statut</span><select data-c="f-champ" data-k="statut" data-focus="statut">${options(STATUTS.map(([v, l]) => ({ v, l })), h.statut)}</select></label>
+      <label class="coche" style="align-self:end"><input type="checkbox" data-c="f-etalon" ${h.etalon ? 'checked' : ''} data-focus="etalon"> Héritier étalon de l’IP</label></div>
+    <label class="champ"><span>Notes</span><textarea data-i="f-notes" data-focus="notes" rows="3">${esc(h.notes || '')}</textarea></label></section>`;
+
+  return `${manquent.length ? `<div class="bandeau info"><span>Pour forger un Héritier complet, il manque encore ${manquent.join(', ')}.</span><button class="btn" data-a="aller" data-v="listes">Ouvrir les listes</button>${DEPOT.mode === 'local' && !B.rows('entites').length ? '<button class="btn discret" data-a="r-exemple">Charger des données d’exemple</button>' : ''}</div>` : ''}
+  <div class="forge">
+    <div class="forge-form">
+      <div class="barre-forge"><h1>${h.id ? 'Héritier' : 'Nouvel Héritier'}</h1><span class="id">${esc(h.id || 'identifiant attribué à l’enregistrement')}</span>${forgeModifiee() ? '<span class="modifie">Modifications non enregistrées</span>' : ''}<span class="espace"></span>
+        <button class="btn" data-a="f-nouveau">${ICO.plus} Nouveau</button>${h.id ? '<button class="btn" data-a="f-dupliquer">Dupliquer</button>' : ''}
+        <button class="btn" data-a="f-generer" title="Tire au sort tous les champs non verrouillés">${ICO.de} Générer</button>
+        <button class="btn prim" data-a="f-enregistrer">${ICO.disque} Enregistrer</button></div>
+      ${secElev}${secHer}${secSph}${secPouv}${secVoc}${secNom}${secStats}${secStatut}
+    </div>
+    <aside class="forge-cote" id="forge-cote" aria-label="Fiche et contrôles">${coteForge()}</aside>
+  </div>`;
+}
+
+function coteForge() {
+  const B = BASE, f = F(), h = f.h;
+  const ent = B.get('entites', h.entite_id), nom = B.get('noms', h.nom_id), pan = ent && B.get('pantheons', ent.pantheon_id);
+  const pc = pan && pan.couleur ? pan.couleur : '';
+  const pouvoir = (c, lib) => {
+    const p = B.get('pouvoirs', h[c]);
+    if (!p) return `<li><span class="emp">${lib}</span><span class="vide">À choisir</span></li>`;
+    const sc = couleurDe('spheres', p.sphere_id);
+    const meta = [libId(B, 'spheres', p.sphere_id), p.emplacement === 'pouvoir' ? `recharge ${nombreFr(p.recharge_s)} s` : p.emplacement === 'ultime' ? `énergie ${nombreFr(p.energie_requise)}` : libId(B, 'declencheurs', p.declencheur_id)].filter(Boolean).join(' · ');
+    return `<li${sc ? ` style="--c:${sc}"` : ''}><span class="emp">${lib}</span><b>${esc(p.nom_fr)}</b><span class="meta">${esc(meta)}</span>${p.texte_modele_fr ? `<p>${esc(p.texte_modele_fr)}</p>` : ''}</li>`;
+  };
+  const fiche = `<article class="fiche"${pc ? ` style="--pc:${pc}"` : ''}>
+    <p class="fiche-sur">${badgeElev(h.elevation_depart_id) || '<span>Élévation à choisir</span>'}${pan ? `<span>${esc(pan.nom_fr)}</span>` : ''}${ent ? `<span>${esc(libId(B, 'types_heritage', ent.type_id))}</span>` : ''}</p>
+    <h2 class="${nom ? '' : 'sans'}">${esc(nom ? nom.nom : 'Sans nom')}</h2>
+    ${ent ? `<p class="fiche-enfant">${esc(enfantDeFr(ent))}<span>${esc(enfantDeEn(ent))}</span></p>` : ''}
+    <dl><dt>Vocation</dt><dd>${esc(libId(B, 'vocations', h.vocation_id)) || '—'}</dd><dt>Ciblage</dt><dd>${esc(libId(B, 'ciblages', h.ciblage_id)) || '—'}</dd>
+      <dt>Sphères</dt><dd class="puces">${h.spheres.filter(s => s.sphere_id).map(s => puceSphere(s.sphere_id, ` · ${esc(libId(B, 'elevations', s.elevation_id))}`)).join('') || '—'}</dd></dl>
+    <ul class="fiche-pouvoirs">${pouvoir('passif_id', 'Passif')}${pouvoir('pouvoir_1_id', 'Pouvoir 1')}${pouvoir('pouvoir_2_id', 'Pouvoir 2')}${pouvoir('ultime_id', 'Ultime')}</ul>
+  </article>`;
+
+  const msgs = validerHeritier(B, h);
+  const pa = new Set(CHAMPS_POUVOIRS.map(([c]) => h[c]).filter(Boolean));
+  for (const x of B.rows('heritiers')) {
+    if (x.id === h.id || x.statut === 'retire') continue;
+    const n = CHAMPS_POUVOIRS.map(([c]) => x[c]).filter(p => p && pa.has(p)).length;
+    if (n >= 3) msgs.push({ niv: 'alerte', msg: `Très proche de ${x.id} ${libHeritier(B, x)} : ${n} pouvoirs sur 4 en commun.` });
+  }
+  const ordre = { erreur: 0, afaire: 1, alerte: 2 };
+  msgs.sort((a, b) => ordre[a.niv] - ordre[b.niv]);
+  const ctrl = `<section class="panneau"><h3>Contrôles <small>${msgs.filter(m => m.niv === 'erreur').length} erreur(s) · ${msgs.filter(m => m.niv === 'afaire').length} à compléter</small></h3>
+    ${f.erreurs ? `<ul class="msgs">${f.erreurs.map(m => `<li class="erreur">${esc(m)}</li>`).join('')}</ul>` : ''}
+    ${msgs.length ? `<ul class="msgs">${msgs.map(m => `<li class="${m.niv}">${esc(m.msg)}</li>`).join('')}</ul>` : `<ul class="msgs"><li class="ok">Toutes les règles sont respectées.</li></ul>`}
+    ${h.statut === 'brouillon' && msgs.some(m => m.niv === 'afaire') ? '<p style="font-size:13px;color:var(--brume)">En brouillon, ces points n’empêchent pas d’enregistrer.</p>' : ''}</section>`;
+
+  const pairs = B.rows('heritiers').filter(x => x.id !== h.id && x.statut !== 'retire' && x.elevation_depart_id === h.elevation_depart_id);
+  const lignes = B.trie('stats').map(s => {
+    const vals = pairs.map(x => B.rows('heritier_stats').find(r => r.heritier_id === x.id && r.stat_id === s.id)).filter(Boolean).map(r => r.valeur).sort((a, b) => a - b);
+    const v = h.stats[s.id];
+    if (!vals.length) return '';
+    const med = vals.length % 2 ? vals[(vals.length - 1) / 2] : (vals[vals.length / 2 - 1] + vals[vals.length / 2]) / 2;
+    const tous = vide(v) || !Number.isFinite(v) ? vals : [...vals, v];
+    let a = Math.min(...tous), b = Math.max(...tous);
+    if (a === b) { a -= 1; b += 1; }
+    const x = val => ((val - a) / (b - a)) * 100;
+    return `<div class="comp-l"><span>${esc(s.abreviation_fr || s.id)}</span>
+      <div class="comp-barre" title="Minimum ${nombreFr(vals[0])}, médiane ${nombreFr(arrondi(med))}, maximum ${nombreFr(vals.at(-1))}">
+        <span class="plage" style="left:${x(vals[0])}%;width:${Math.max(1, x(vals.at(-1)) - x(vals[0]))}%"></span><span class="med" style="left:${x(med)}%"></span>
+        ${vide(v) || !Number.isFinite(v) ? '' : `<span class="moi" style="left:${x(v)}%"></span>`}</div>
+      <span class="v">${vide(v) ? '—' : nombreFr(v)}</span></div>`;
+  }).filter(Boolean);
+  const eq = `<section class="panneau"><h3>Équilibrage</h3>
+    <ul class="msgs"><li class="alerte">Indice de puissance : à définir ensemble (P7). La comparaison ci-dessous porte sur les stats saisies.</li></ul>
+    ${lignes.length ? `<p class="legende-comp"><span><i style="width:14px;height:4px;background:var(--filet-fort)"></i>Plage du registre</span><span><i style="width:2px;height:12px;background:var(--brume)"></i>Médiane</span><span><i style="width:10px;height:10px;border-radius:50%;background:var(--or)"></i>Cet Héritier</span></p>
+      <p style="font-size:13px;color:var(--brume)">Comparé à ${pairs.length} Héritier${pairs.length > 1 ? 's' : ''} de départ ${esc(libId(B, 'elevations', h.elevation_depart_id))}.</p><div class="comp">${lignes.join('')}</div>`
+      : `<p style="font-size:13px;color:var(--brume)">${h.elevation_depart_id ? `Aucun autre Héritier de départ ${esc(libId(B, 'elevations', h.elevation_depart_id))} avec des stats pour comparer.` : 'Choisis une élévation de départ pour comparer les stats au registre.'}</p>`}
+  </section>`;
+  return fiche + ctrl + eq;
+}
+function rafraichirCote() { const c = $('#forge-cote'); if (c) c.innerHTML = coteForge(); const m = $('.barre-forge .modifie'); const doit = forgeModifiee(); if (!!m !== doit) rendre(); }
+
+async function enregistrerForge() {
+  const f = F();
+  f.erreurs = null;
+  try {
+    const id = await occuper('Enregistrement…', () => Ecrire.heritier(f.h));
+    ouvrirHeritier(id);
+    notifier(`${libHeritier(BASE, BASE.get('heritiers', id))} enregistré sous ${id}.`);
+  } catch (e) {
+    f.erreurs = messagesErreur(e);
+    notifier('Enregistrement refusé : voir les contrôles.', 'erreur');
+  }
+  rendre();
+}
+
+/* ═════════════ Héritiers ═════════════ */
+function vueHeritiers() {
+  if (DEPOT.mode === 'supabase' && !DEPOT.pret) return bandeauConnexion();
+  const B = BASE, x = UI.HX, q = x.q.trim().toLowerCase();
+  const tous = B.rows('heritiers');
+  const lignes = tous.map(h => {
+    const ent = B.get('entites', h.entite_id), v = validerHeritier(B, heritierDepuisBase(B, h.id));
+    return { h, ent, nom: libHeritier(B, h), err: v.filter(m => m.niv === 'erreur').length, af: v.filter(m => m.niv === 'afaire').length };
+  }).filter(l => (!x.statut || l.h.statut === x.statut) && (!x.elevation || l.h.elevation_depart_id === x.elevation)
+    && (!x.pantheon || (l.ent && l.ent.pantheon_id === x.pantheon)) && (!x.vocation || l.h.vocation_id === x.vocation)
+    && (!q || `${l.h.id} ${l.nom} ${l.ent ? l.ent.nom_fr : ''}`.toLowerCase().includes(q)))
+    .sort((a, b) => a.h.id.localeCompare(b.h.id));
+  const parStatut = STATUTS.map(([k, l]) => `${tous.filter(h => h.statut === k).length} ${l.toLowerCase()}`).join(' · ');
+  const ouvrir = x.ouvrir && B.get('heritiers', x.ouvrir.id);
+  return `<div class="vue-tete"><h1>Héritiers</h1><span class="sous">${tous.length} au registre · ${parStatut}</span><span class="espace"></span><button class="btn prim" data-a="f-nouveau-aller">${ICO.plus} Nouvel Héritier</button></div>
+    ${ouvrir ? `<div class="bandeau afaire"><span>La Forge contient des modifications non enregistrées. Les abandonner pour ${x.ouvrir.copier ? 'dupliquer' : 'ouvrir'} ${esc(ouvrir.id)} ?</span><button class="btn" data-a="h-ouvrir-ok">Abandonner et continuer</button><button class="btn discret" data-a="h-ouvrir-non">Garder mes modifications</button></div>` : ''}
+    <div class="filtres">
+      <input type="search" placeholder="Rechercher un nom, un parent, un identifiant" value="${esc(x.q)}" data-i="h-q" data-focus="hq" aria-label="Rechercher">
+      <select data-c="h-filtre" data-k="statut" aria-label="Statut">${options(STATUTS.map(([v, l]) => ({ v, l })), x.statut, 'Tous les statuts')}</select>
+      <select data-c="h-filtre" data-k="elevation" aria-label="Élévation">${options(elevTriees().map(e => ({ v: e.id, l: e.nom_fr })), x.elevation, 'Toutes les élévations')}</select>
+      <select data-c="h-filtre" data-k="pantheon" aria-label="Panthéon">${options(B.trie('pantheons').map(p => ({ v: p.id, l: p.nom_fr })), x.pantheon, 'Tous les panthéons')}</select>
+      <select data-c="h-filtre" data-k="vocation" aria-label="Vocation">${options(B.trie('vocations').map(v => ({ v: v.id, l: v.nom_fr })), x.vocation, 'Toutes les vocations')}</select>
+    </div>
+    ${lignes.length ? `<div class="tab-wrap"><table class="tab"><thead><tr><th>Héritier</th><th>Identifiant</th><th>Héritage</th><th>Départ</th><th>Vocation</th><th>Statut</th><th>Contrôles</th><th></th></tr></thead><tbody>
+      ${lignes.map(l => `<tr><td><button class="lien" data-a="h-ouvrir" data-id="${esc(l.h.id)}">${esc(l.nom)}</button></td><td class="mono">${esc(l.h.id)}</td>
+        <td>${l.ent ? `${esc(enfantDeFr(l.ent))} <small style="color:var(--brume)">· ${esc(libId(B, 'pantheons', l.ent.pantheon_id))}</small>` : '—'}</td>
+        <td>${badgeElev(l.h.elevation_depart_id) || '—'}</td><td>${esc(libId(B, 'vocations', l.h.vocation_id)) || '—'}</td>
+        <td><span class="pill ${esc(l.h.statut)}">${esc(STATUT_LIB[l.h.statut] || l.h.statut)}</span></td>
+        <td><span class="marque-ctrl">${l.err ? `<span class="e">${l.err} erreur${l.err > 1 ? 's' : ''}</span>` : ''}${l.af ? `<span class="a">${l.af} à compléter</span>` : ''}${!l.err && !l.af ? '<span style="color:var(--ok)">Conforme</span>' : ''}</span></td>
+        <td><div class="actions">${x.confirm === l.h.id
+          ? `<button class="btn danger arme" data-a="h-suppr-ok" data-id="${esc(l.h.id)}">Confirmer la suppression</button><button class="btn discret" data-a="h-suppr-non">Annuler</button>`
+          : `<button class="btn discret" data-a="h-dupliquer" data-id="${esc(l.h.id)}">Dupliquer</button><button class="btn discret" data-a="h-suppr" data-id="${esc(l.h.id)}">Supprimer</button>`}</div></td></tr>`).join('')}
+    </tbody></table></div>` : `<div class="vide-etat"><h2>${tous.length ? 'Aucun Héritier ne correspond à ces filtres' : 'Le registre est vide'}</h2><p>${tous.length ? 'Élargis les filtres ou la recherche.' : 'Crée le premier Héritier dans la Forge.'}</p></div>`}`;
+}
+
+/* ═════════════ Listes ═════════════ */
+const GROUPES = ['Héritage', 'Pouvoirs', 'Modificateurs', 'Transversal'];
+function infoLigne(t, r) {
+  const B = BASE;
+  switch (t) {
+    case 'entites': return `${libId(B, 'pantheons', r.pantheon_id)} · ${libId(B, 'types_heritage', r.type_id)} · ${B.liste(LS_ENTITE, r.id).map(s => libId(B, 'spheres', s)).join(', ') || 'aucune sphère'}`;
+    case 'noms': return `${libId(B, 'origines', r.origine_id)} · ${r.genre}`;
+    case 'pouvoirs': return `${EMP_LIB[r.emplacement]} · ${libId(B, 'spheres', r.sphere_id)}${r.statut === 'brouillon' ? ' · brouillon' : ''}`;
+    case 'origines': return r.universelle ? 'Universelle' : B.liste(LS_ORIGINE, r.id).map(p => libId(B, 'pantheons', p)).join(', ') || 'Aucun panthéon';
+    case 'elevations': return `ordre ${r.ordre} · ${r.nb_spheres} sphère(s)`;
+    case 'ecarts_elevation': return `coefficient ${nombreFr(r.coefficient)}`;
+    case 'stats': return [r.abreviation_fr, r.unite, vide(r.valeur_ref) ? '' : 'réf. ' + nombreFr(r.valeur_ref)].filter(Boolean).join(' · ');
+    case 'ciblages': return { ennemi: 'Ennemi', allie: 'Allié', soi: 'Soi' }[r.camp];
+    case 'effets': return libId(B, 'types_effet', r.type_effet_id);
+    case 'synergies': { const E = versEdition(B, t, r); return `${E.critere.type ? META.synergies.cols.find(c => c.n === 'critere').choix[E.critere.type].l : ''} · ${libId(B, { pantheon: 'pantheons', type: 'types_heritage', sphere: 'spheres', vocation: 'vocations' }[E.critere.type] || 'pantheons', E.critere.id)}`; }
+    case 'modificateurs': return `${{ heritier: 'Héritier', sphere: 'Pouvoirs de la sphère', equipe: 'Équipe' }[r.portee] || ''}${r.condition ? ' · si ' + r.condition : ''}`;
+    case 'constantes': return `${nombreFr(r.valeur)} ${r.unite || ''}`;
+    default: return r.description_fr || '';
+  }
+}
+const manqueEn = (t, r) => META[t].cols.some(c => c.en && !vide(r[c.n.replace(/_en$/, '_fr')]) && vide(r[c.n]));
+function ouvrirLigne(t, cle, init) {
+  const L = UI.L;
+  L.table = t; L.cle = cle; L.erreurs = []; L.confirm = false;
+  L.E = cle ? versEdition(BASE, t, BASE.get(t, cle)) : nouvelleEdition(t, init || {});
+  UI.vue = 'listes';
+}
+function vueListes() {
+  if (DEPOT.mode === 'supabase' && !DEPOT.pret) return bandeauConnexion();
+  const B = BASE, L = UI.L, t = L.table, m = META[t], q = L.q.trim().toLowerCase();
+  const nav = GROUPES.map(g => `<div><h3>${g}</h3>${Object.keys(META).filter(k => META[k].dom === g).map(k => `<button data-a="l-table" data-t="${k}" aria-current="${k === t}">${esc(META[k].titre)}<span>${B.rows(k).length}</span></button>`).join('')}</div>`).join('');
+  const rows = B.trie(t).filter(r => !q || `${libRow(B, t, r)} ${cleDe(t, r)} ${infoLigne(t, r)}`.toLowerCase().includes(q));
+  const lignes = rows.map(r => { const k = cleDe(t, r); return `<button data-a="l-ligne" data-k="${esc(k)}" aria-current="${k === L.cle}"><span class="l1">${esc(libRow(B, t, r))}${manqueEn(t, r) ? '<span class="en" title="Traduction anglaise manquante"></span>' : ''}</span><span class="idm">${esc(CLES[t] ? '' : k)}</span><span class="l2">${esc(infoLigne(t, r))}</span></button>`; }).join('');
+  return `<div class="listes"><nav class="listes-nav" aria-label="Registres">${nav}</nav>
+    <section><div class="vue-tete"><h1>${esc(m.titre)}</h1><span class="sous">${B.rows(t).length} élément${B.rows(t).length > 1 ? 's' : ''}</span><span class="espace"></span>
+      <input type="search" style="max-width:260px" placeholder="Filtrer" value="${esc(L.q)}" data-i="l-q" data-focus="lq" aria-label="Filtrer la liste">
+      <button class="btn prim" data-a="l-nouveau">${ICO.plus} Ajouter</button></div>
+      <div class="listes-corps"><div class="lignes">${lignes || `<p class="rien">${B.rows(t).length ? 'Aucun élément ne correspond.' : 'Liste vide. Ajoute le premier élément.'}</p>`}</div>
+        <div>${L.E ? formulaireLigne() : `<div class="vide-etat"><h2>${esc(m.titre)}</h2><p>Choisis un élément dans la liste ou ajoute-en un.</p></div>`}</div></div></section></div>`;
+}
+function champHtml(t, c, E, nouveau) {
+  const B = BASE, v = E[c.n], id = `l-${c.n}`;
+  const large = ['long', 'liste', 'pivot', 'poly'].includes(c.t) ? ' large' : '';
+  const lab = `${esc(c.l)}${c.req ? ' *' : ''}`;
+  switch (c.t) {
+    case 'slug': return `<label class="champ"><span>${lab}</span>${nouveau ? `<input type="text" id="${id}" value="${esc(v)}" data-i="l-champ" data-k="${c.n}" data-focus="${id}" placeholder="minuscules_et_chiffres" autocomplete="off">` : `<span class="ro">${esc(v)}</span>`}</label>`;
+    case 'auto': {
+      const pre = META[t].prefixe ? META[t].prefixe(E) : c.prefixe;
+      return `<label class="champ"><span>${lab}</span>${nouveau ? `<input type="text" id="${id}" value="${esc(v)}" data-i="l-champ" data-k="${c.n}" data-focus="${id}" placeholder="Automatique (${pre}…)" autocomplete="off">` : `<span class="ro">${esc(v)}</span>`}</label>`;
+    }
+    case 'texte': return `<label class="champ"><span>${lab}</span><input type="text" id="${id}" value="${esc(v)}" data-i="l-champ" data-k="${c.n}" data-focus="${id}"></label>`;
+    case 'long': return `<label class="champ large"><span>${lab}</span><textarea id="${id}" data-i="l-champ" data-k="${c.n}" data-focus="${id}" rows="3">${esc(v)}</textarea></label>`;
+    case 'entier': case 'nombre': return `<label class="champ"><span>${lab}</span><input type="text" inputmode="decimal" id="${id}" value="${esc(typeof v === 'number' && Number.isNaN(v) ? '' : nombreFr(v))}" data-i="l-nombre" data-k="${c.n}" data-focus="${id}"></label>`;
+    case 'bool': return `<label class="coche"><input type="checkbox" id="${id}" ${v ? 'checked' : ''} data-c="l-bool" data-k="${c.n}" data-focus="${id}"> ${esc(c.l)}</label>`;
+    case 'couleur': return `<label class="champ"><span>${lab}</span><span style="display:flex;gap:8px"><input type="color" value="${esc(v || '#888888')}" data-c="l-champ" data-k="${c.n}" aria-label="${esc(c.l)}"><input type="text" id="${id}" value="${esc(v)}" data-i="l-champ" data-k="${c.n}" data-focus="${id}" placeholder="#RRVVBB"></span></label>`;
+    case 'enum': {
+      const fige = c.fige && !nouveau;
+      return `<label class="champ"><span>${lab}</span>${fige ? `<span class="ro">${esc((c.vals.find(([k]) => k === v) || [, v])[1])}</span>` : `<select id="${id}" data-c="l-champ" data-k="${c.n}" data-focus="${id}">${options(c.vals.map(([k, l]) => ({ v: k, l })), v, c.req && !vide(v) ? undefined : 'Choisir…')}</select>`}</label>`;
+    }
+    case 'ref': return `<label class="champ"><span>${lab}</span><select id="${id}" data-c="l-champ" data-k="${c.n}" data-focus="${id}">${options(B.trie(c.table).map(r => ({ v: cleDe(c.table, r), l: libRow(B, c.table, r) + (CLES[c.table] ? '' : ` (${cleDe(c.table, r)})`) })), v, c.req ? 'Choisir…' : 'Aucun')}</select></label>`;
+    case 'liste': return `<div class="champ large"><span>${lab}</span><div class="choix-multi" role="group" aria-label="${esc(c.l)}">${B.trie(c.table).map(r => { const on = (v || []).includes(r.id); return `<button data-a="l-liste" data-k="${c.n}" data-v="${esc(r.id)}" aria-pressed="${on}"${r.couleur ? ` style="--c:${r.couleur}"` : ''}>${esc(libRow(B, c.table, r))}</button>`; }).join('') || `<span style="color:var(--brume);font-size:13px">Liste ${esc(TITRES[c.table].toLowerCase())} vide.</span>`}</div></div>`;
+    case 'pivot': return `<div class="champ large"><span>${lab}</span><div class="pivot">${B.trie(c.table).map(r => `<label>${esc(libRow(B, c.table, r))}<input type="text" inputmode="decimal" value="${esc(nombreFr((v || {})[r.id]))}" data-i="l-pivot" data-k="${c.n}" data-v="${esc(r.id)}" data-focus="pv-${c.n}-${esc(r.id)}"></label>`).join('') || `<span style="color:var(--brume);font-size:13px">Liste ${esc(TITRES[c.table].toLowerCase())} vide.</span>`}</div></div>`;
+    case 'poly': {
+      const p = v || { type: '', id: '' }, ch = c.choix[p.type];
+      const rows = ch ? B.trie(ch.table).filter(r => !ch.filtre || ch.filtre(r)) : [];
+      return `<div class="champ large"><span>${lab}</span><div class="deux"><select data-c="l-poly-type" data-k="${c.n}" aria-label="${esc(c.l)} : type" data-focus="pt-${c.n}">${options(Object.entries(c.choix).map(([k, x]) => ({ v: k, l: x.l })), p.type, 'Type…')}</select>
+        <select data-c="l-poly-id" data-k="${c.n}" aria-label="${esc(c.l)}" data-focus="pi-${c.n}" ${ch ? '' : 'disabled'}>${options(rows.map(r => ({ v: cleDe(ch.table, r), l: libRow(B, ch.table, r) })), p.id, 'Choisir…')}</select></div></div>`;
+    }
+  }
+  return '';
+}
+function formulaireLigne() {
+  const B = BASE, L = UI.L, t = L.table, m = META[t], E = L.E, nouveau = vide(L.cle);
+  const champs = m.cols.filter(c => !c.si || c.si(E)).map(c => champHtml(t, c, E, nouveau)).join('');
+  let enfants = '', usage = '';
+  if (!nouveau) {
+    for (const en of m.enfants || []) {
+      const rows = en.poly ? B.trie(en.table).filter(r => r[META[en.table].cols.find(c => c.n === en.poly.col).choix[en.poly.type].col] === L.cle) : B.trie(en.table).filter(r => r[en.fk] === L.cle);
+      enfants += `<div class="sous-liste"><h3>${esc(en.titre)} (${rows.length})</h3><ul>${rows.map(r => `<li><button data-a="l-enfant" data-t="${en.table}" data-k="${esc(cleDe(en.table, r))}"><span>${esc(libRow(B, en.table, r))}</span><span class="mono">${esc(cleDe(en.table, r))}</span></button></li>`).join('')}</ul>
+        <div><button class="btn discret" data-a="l-enfant-nouveau" data-t="${en.table}" data-fk="${en.fk}" data-poly="${en.poly ? en.poly.col + ':' + en.poly.type : ''}">${ICO.plus} Ajouter</button></div></div>`;
+    }
+    const plan = planSuppression(B, t, L.cle);
+    const parTable = {};
+    for (const x of [...plan.bloque, ...plan.cascade]) parTable[x.t] = (parTable[x.t] || 0) + 1;
+    const heritiers = plan.bloque.filter(x => x.t === 'heritiers');
+    usage = `<div class="sous-liste"><h3>Utilisé par</h3>${Object.keys(parTable).length ? `<p style="font-size:14px">${Object.entries(parTable).map(([k, n]) => `${n} × ${esc(TITRES[k] || k)}`).join(' · ')}</p>` : '<p style="font-size:14px;color:var(--brume)">Rien ne fait référence à cet élément.</p>'}
+      ${heritiers.length ? `<ul>${heritiers.slice(0, 12).map(x => `<li><button data-a="go-heritier" data-id="${esc(x.cle)}"><span>${esc(libId(B, 'heritiers', x.cle))}</span><span class="mono">${esc(x.cle)}</span></button></li>`).join('')}</ul>` : ''}</div>`;
+  }
+  const plan = !nouveau && planSuppression(B, t, L.cle);
+  const apercu = m.apercu ? `<p class="apercu" id="l-apercu">${esc(m.apercu(E))}</p>` : '';
+  return `<div class="formulaire">
+    <div class="formulaire-tete">${L.retour ? `<button class="btn discret" data-a="l-retour">← ${esc(libId(B, L.retour.t, L.retour.cle))}</button>` : ''}<h2>${nouveau ? 'Nouvel élément' : esc(libRow(B, t, B.get(t, L.cle)))}</h2>${nouveau ? '' : `<span class="mono">${esc(L.cle)}</span>`}</div>
+    ${L.erreurs.length ? `<ul class="msgs">${L.erreurs.map(e => `<li class="erreur">${esc(e)}</li>`).join('')}</ul>` : ''}
+    <div class="grille-champs">${champs}</div>${apercu}${enfants}${usage}
+    <div class="actions"><button class="btn prim" data-a="l-enregistrer">${ICO.disque} Enregistrer</button><button class="btn discret" data-a="l-annuler">Fermer</button><span class="espace"></span>
+      ${nouveau ? '' : plan.bloque.length ? `<span style="font-size:13px;color:var(--brume)">Suppression impossible tant qu’il est utilisé.</span>`
+        : L.confirm ? `<button class="btn danger arme" data-a="l-suppr-ok">Confirmer${plan.cascade.length ? ` (et ${plan.cascade.length} élément${plan.cascade.length > 1 ? 's' : ''} lié${plan.cascade.length > 1 ? 's' : ''})` : ''}</button><button class="btn discret" data-a="l-suppr-non">Annuler</button>`
+        : '<button class="btn danger" data-a="l-suppr">Supprimer</button>'}</div></div>`;
+}
+
+/* ═════════════ Échanges ═════════════ */
+function vueEchanges() {
+  if (DEPOT.mode === 'supabase' && !DEPOT.pret) return bandeauConnexion();
+  const B = BASE, X = UI.X;
+  const derniere = lireReglages().version_build || 0;
+  if (X.version === null) X.version = derniere + 1;
+  const enJeu = B.rows('heritiers').filter(h => h.statut === 'en_jeu').length;
+  const rapport = X.sim ? `<div class="rapport">${X.sim.rapport.map(r => `<div class="rapport-l"><b>${esc(r.fichier)} → ${esc(TITRES[r.table])}</b>
+      <span class="chiffres"><span><b>${r.crees}</b> créé(s)</span><span><b>${r.maj}</b> mis à jour</span><span><b>${r.inchanges}</b> inchangé(s)</span><span style="color:${r.refus.length ? 'var(--err)' : 'inherit'}"><b>${r.refus.length}</b> refusé(s)</span></span>
+      ${r.avertissements.map(a => `<ul class="msgs"><li class="alerte">${esc(a)}</li></ul>`).join('')}
+      ${r.refus.length ? `<ul class="msgs">${r.refus.slice(0, 40).map(x => `<li class="erreur">Ligne ${x.ligne}${x.id ? ' · ' + esc(x.id) : ''} : ${esc(x.raisons.join(' '))}</li>`).join('')}${r.refus.length > 40 ? `<li class="erreur">… et ${r.refus.length - 40} autres lignes refusées.</li>` : ''}</ul>` : ''}</div>`).join('')}
+    ${X.sim.ok ? `<div class="actions"><button class="btn prim" data-a="x-appliquer">${ICO.haut} Appliquer l’import</button><span style="font-size:13px;color:var(--brume)">${DEPOT.mode === 'supabase' ? 'Écrit dans Supabase.' : 'Écrit dans la base locale.'}</span></div>`
+      : '<ul class="msgs"><li class="erreur">Rien n’est écrit tant qu’une ligne est refusée. Corrige le fichier puis analyse-le à nouveau.</li></ul>'}
+    ${X.progression ? `<p>${esc(X.progression)}</p>` : ''}</div>` : '';
+  return `<div class="vue-tete"><h1>Échanges</h1><span class="sous">TSV au format des modèles, et build du jeu</span></div>
+  <div class="cartes">
+    <section class="panneau"><h3>Importer des TSV</h3>
+      <div class="depot" id="depot"><p>Dépose ici un ou plusieurs fichiers .tsv, nommés comme les registres (pantheons.tsv, heritiers.tsv…).</p>
+        <label class="btn">${ICO.haut} Choisir des fichiers<input type="file" accept=".tsv,.txt,text/tab-separated-values" multiple data-c="x-fichiers" hidden></label></div>
+      ${X.lots.length ? `<ul class="fichiers">${X.lots.map((l, i) => `<li><span>${esc(l.fichier)} · ${l.lignes.length} ligne${l.lignes.length > 1 ? 's' : ''}</span>
+        <select data-c="x-table" data-i="${i}" aria-label="Registre de ${esc(l.fichier)}">${options(TABLES_ECHANGE.map(t => ({ v: t, l: TITRES[t] })), l.table, 'Registre ?')}</select>
+        <button class="btn discret" data-a="x-retirer" data-i="${i}">Retirer</button></li>`).join('')}</ul>
+        <div class="actions"><button class="btn prim" data-a="x-analyser" ${X.lots.every(l => l.table) ? '' : 'disabled'}>Analyser</button><button class="btn discret" data-a="x-vider">Tout retirer</button>
+          <span style="font-size:13px;color:var(--brume)">L’analyse ne modifie rien.</span></div>` : ''}
+      ${rapport}
+      <p style="font-size:13px;color:var(--brume)">Une ligne avec un identifiant existant met à jour cet élément ; seules les colonnes présentes dans le fichier changent. Un fichier avec juste <code>id</code> et <code>nom_en</code> sert donc à importer des traductions.</p>
+    </section>
+    <section class="panneau"><h3>Exporter en TSV</h3>
+      <div class="actions"><button class="btn prim" data-a="x-export-tout">${ICO.bas} Tout exporter (.zip)</button></div>
+      <div class="export-grille">${TABLES_ECHANGE.map(t => `<button class="btn" data-a="x-export" data-t="${t}">${esc(TITRES[t])}<span class="mono">${B.rows(t).length}</span></button>`).join('')}</div>
+    </section>
+    <section class="panneau"><h3>Build du jeu</h3>
+      <p style="font-size:14px">Fichier JSON des ${enJeu} Héritier${enJeu > 1 ? 's' : ''} « en jeu » et de tout ce qu’ils utilisent, à livrer avec le jeu publié. Ni brouillons, ni notes, ni journal.</p>
+      <div class="actions"><label class="champ" style="width:120px"><span>Version</span><input type="text" inputmode="numeric" value="${esc(X.version)}" data-i="x-version" data-focus="xv"></label>
+        <button class="btn prim" data-a="x-build" style="align-self:end" ${enJeu ? '' : 'disabled'}>${ICO.bas} Générer le build</button></div>
+      ${derniere ? `<p style="font-size:13px;color:var(--brume)">Dernier build généré : version ${derniere}.</p>` : ''}
+      ${X.build ? `<ul class="msgs">${X.build.map(m => `<li class="erreur">${esc(m)}</li>`).join('')}</ul>` : ''}
+    </section>
+  </div>`;
+}
+async function lireFichiers(fichiers) {
+  for (const f of fichiers) {
+    const texte = await f.text();
+    const { entetes, lignes } = lireTSV(texte);
+    const nom = f.name.replace(/\.(tsv|txt)$/i, '').toLowerCase().replace(/[^a-z_]/g, '');
+    UI.X.lots.push({ fichier: f.name, table: TABLES_ECHANGE.includes(nom) ? nom : '', entetes, lignes });
+  }
+  UI.X.sim = null;
+  rendre();
+}
+
+/* ═════════════ Contrôles ═════════════ */
+function vueControles() {
+  if (DEPOT.mode === 'supabase' && !DEPOT.pret) return bandeauConnexion();
+  const B = BASE, c = controlesRegistre(B);
+  const lienH = h => `<button class="lien" data-a="go-heritier" data-id="${esc(h.id)}">${esc(h.id)} ${esc(libHeritier(B, h))}</button>`;
+  const lienL = (t, r) => `<button class="lien" data-a="go-ligne" data-t="${t}" data-k="${esc(cleDe(t, r))}">${esc(libRow(B, t, r))}</button>`;
+  const bloc = (titre, n, items, vide) => `<section class="panneau"><h3>${titre} <small>${n}</small></h3>${n ? `<ul class="liste-ctrl">${items}</ul>` : `<p style="font-size:14px;color:var(--brume)">${vide}</p>`}</section>`;
+  const i = c.inutilises;
+  return `<div class="vue-tete"><h1>Contrôles du registre</h1><span class="sous">Recalculés à chaque ouverture</span></div>
+  <div class="cartes">
+    ${bloc('Héritiers en erreur', c.invalides.length, c.invalides.map(x => `<li>${lienH(x.h)}<small>${esc(x.msgs.join(' '))}</small></li>`).join(''), 'Aucun Héritier ne viole une règle.')}
+    ${bloc('Brouillons à compléter', c.incomplets.length, c.incomplets.map(x => `<li>${lienH(x.h)}<small>${esc(x.msgs.join(' '))}</small></li>`).join(''), 'Aucun brouillon incomplet.')}
+    ${bloc('Héritiers trop proches', c.proches.length, c.proches.map(x => `<li>${lienH(x.a)} et ${lienH(x.b)}<small>${x.n} pouvoirs sur 4 en commun</small></li>`).join(''), 'Aucune paire ne partage 3 pouvoirs ou plus.')}
+    ${bloc('Entités sans sphère héritable', i.entitesSansSphere.length, i.entitesSansSphere.map(r => `<li>${lienL('entites', r)}<small>Aucun Héritier valide ne peut en descendre.</small></li>`).join(''), 'Toutes les entités ont au moins une sphère héritable.')}
+    ${bloc('Pouvoirs portés par aucun Héritier', i.pouvoirs.length, i.pouvoirs.map(r => `<li>${lienL('pouvoirs', r)}<small>${esc(EMP_LIB[r.emplacement])} · ${esc(libId(B, 'spheres', r.sphere_id))}</small></li>`).join(''), 'Tous les pouvoirs sont utilisés.')}
+    ${bloc('Sphères sans pouvoir', i.spheresSansPouvoir.length, i.spheresSansPouvoir.map(r => `<li>${lienL('spheres', r)}</li>`).join(''), 'Chaque sphère a au moins un pouvoir.')}
+    ${bloc('Sphères qu’aucune entité ne transmet', i.spheresNonHeritables.length, i.spheresNonHeritables.map(r => `<li>${lienL('spheres', r)}</li>`).join(''), 'Chaque sphère est héritable d’au moins une entité.')}
+    ${bloc('Vocations sans profil de stats', i.vocationsSansProfil.length, i.vocationsSansProfil.map(r => `<li>${lienL('vocations', r)}<small>Le bouton Auto utilisera les valeurs de référence telles quelles.</small></li>`).join(''), 'Toutes les vocations ont un profil.')}
+    ${bloc('Stats sans valeur de référence', i.statsSansReference.length, i.statsSansReference.map(r => `<li>${lienL('stats', r)}</li>`).join(''), 'Toutes les stats ont une valeur de référence.')}
+    ${bloc('Traductions anglaises manquantes', c.traductions.reduce((a, x) => a + x.n, 0), c.traductions.map(x => `<li><button class="lien" data-a="l-table" data-t="${x.t}">${esc(TITRES[x.t])}</button><small>${x.n} élément${x.n > 1 ? 's' : ''}</small></li>`).join(''), 'Tous les textes ont leur version anglaise.')}
+  </div>`;
+}
+
+/* ═════════════ Journal ═════════════ */
+function vueJournal() {
+  if (DEPOT.mode === 'supabase' && !DEPOT.pret) return bandeauConnexion();
+  const J = UI.J;
+  const entrees = DEPOT.mode === 'local' ? [...DEPOT.journal].reverse().slice(0, 300) : J.entrees;
+  if (DEPOT.mode === 'supabase' && !J.entrees && !J.erreur) { chargerJournal(); return '<p>Chargement du journal…</p>'; }
+  const op = { INSERT: 'Création', UPDATE: 'Modification', DELETE: 'Suppression' };
+  return `<div class="vue-tete"><h1>Journal</h1><span class="sous">${DEPOT.mode === 'local' ? 'Base locale' : 'Supabase'} · 300 dernières modifications</span><span class="espace"></span>${DEPOT.mode === 'supabase' ? '<button class="btn" data-a="j-actualiser">Actualiser</button>' : ''}</div>
+    ${J.erreur ? `<div class="bandeau err">${esc(J.erreur)}</div>` : ''}
+    ${entrees && entrees.length ? `<div class="tab-wrap"><table class="tab"><thead><tr><th>Date</th><th>Registre</th><th>Élément</th><th>Opération</th><th>Champs</th></tr></thead><tbody>
+      ${entrees.map(e => `<tr><td class="num">${esc(new Date(e.date).toLocaleString('fr-FR'))}</td><td>${esc(TITRES[e.table_nom] || e.table_nom)}</td><td class="mono">${esc(e.ligne_id)}</td><td>${esc(op[e.operation] || e.operation)}</td><td>${esc((e.champs || []).join(', '))}</td></tr>`).join('')}
+    </tbody></table></div>` : '<div class="vide-etat"><h2>Aucune modification enregistrée</h2></div>'}`;
+}
+async function chargerJournal() {
+  try { UI.J.entrees = await Supa.journal(); UI.J.erreur = null; } catch (e) { UI.J.erreur = messagesErreur(e).join(' '); UI.J.entrees = []; }
+  if (UI.vue === 'journal') rendre();
+}
+
+/* ═════════════ Réglages ═════════════ */
+function bandeauConnexion() {
+  return `<div class="vide-etat"><h2>Connexion à Supabase requise</h2><p>La source choisie est Supabase, mais aucune session n’est ouverte.</p><button class="btn prim" data-a="aller" data-v="reglages">Ouvrir les réglages</button></div>`;
+}
+function vueReglages() {
+  const R = UI.R, sup = DEPOT.mode === 'supabase';
+  const theme = lireReglages().theme || '';
+  return `<div class="vue-tete"><h1>Réglages</h1></div>
+  <div class="cartes">
+    <section class="panneau"><h3>Source des données</h3>
+      <div class="radios">
+        <label><input type="radio" name="src" value="local" data-c="r-source" ${sup ? '' : 'checked'}><span><b>Base locale</b><small>Dans ce navigateur. Sauvegarde-la par l’export TSV.</small></span></label>
+        <label><input type="radio" name="src" value="supabase" data-c="r-source" ${sup ? 'checked' : ''}><span><b>Supabase</b><small>Ta base en ligne, avec ses règles et son journal.</small></span></label>
+      </div></section>
+    <section class="panneau"><h3>Supabase ${sup && DEPOT.pret ? `<small>Connecté : ${esc(DEPOT.utilisateur && DEPOT.utilisateur.email)}</small>` : ''}</h3>
+      ${Supa.pret() ? '' : '<div class="bandeau err">La bibliothèque Supabase n’a pas pu se charger. Vérifie la connexion internet puis recharge la page.</div>'}
+      ${R.msg ? `<div class="bandeau ${R.msg.type}">${R.msg.html}</div>` : ''}
+      <label class="champ"><span>URL du projet</span><input type="text" value="${esc(R.url)}" data-i="r-champ" data-k="url" data-focus="ru" autocomplete="off"></label>
+      <label class="champ"><span>Clé publishable</span><span style="display:flex;gap:6px"><input type="${R.montrerCle ? 'text' : 'password'}" value="${esc(R.cle)}" data-i="r-champ" data-k="cle" data-focus="rc" autocomplete="off" placeholder="sb_publishable_…"><button class="btn discret" data-a="r-montrer">${R.montrerCle ? 'Masquer' : 'Afficher'}</button></span></label>
+      ${sup && DEPOT.pret ? `<div class="actions"><button class="btn" data-a="r-recharger">Recharger les données</button><button class="btn discret" data-a="r-deconnecter">Se déconnecter</button></div>` : `
+      <div class="deux"><label class="champ"><span>E-mail</span><input type="email" value="${esc(R.email)}" data-i="r-champ" data-k="email" data-focus="re" autocomplete="username"></label>
+        <label class="champ"><span>Mot de passe</span><input type="password" value="${esc(R.mdp)}" data-i="r-champ" data-k="mdp" data-focus="rm" autocomplete="current-password"></label></div>
+      <div class="actions"><button class="btn prim" data-a="r-connecter" ${Supa.pret() ? '' : 'disabled'}>Se connecter</button></div>`}
+      <p style="font-size:13px;color:var(--brume)">La clé publishable se trouve dans les réglages API du projet. Ne colle jamais la clé secrète ici.</p></section>
+    <section class="panneau"><h3>Base locale <small>${DEPOT.mode === 'local' ? 'active' : 'inactive'}</small></h3>
+      <p style="font-size:14px">${DEPOT.mode === 'local' ? `${BASE.rows('heritiers').length} Héritier(s), ${BASE.rows('pouvoirs').length} pouvoir(s), ${BASE.rows('entites').length} entité(s).` : 'Bascule sur la base locale pour la consulter.'}</p>
+      <div class="actions">
+        ${DEPOT.mode === 'local' ? '<button class="btn" data-a="r-exemple">Ajouter des données d’exemple</button>' : ''}
+        ${sup && DEPOT.pret ? '<button class="btn" data-a="r-copier-local">Copier les données Supabase dans la base locale</button>' : ''}
+        ${DEPOT.mode === 'local' ? (R.confirmVider ? '<button class="btn danger arme" data-a="r-vider-ok">Confirmer : tout effacer</button><button class="btn discret" data-a="r-vider-non">Annuler</button>' : '<button class="btn danger" data-a="r-vider">Vider la base locale</button>') : ''}
+      </div>
+      <p style="font-size:13px;color:var(--brume)">Les données d’exemple portent la description « Exemple » pour être faciles à retrouver.</p></section>
+    <section class="panneau"><h3>Apparence</h3>
+      <div class="seg" role="group" aria-label="Thème">${[['', 'Système'], ['dark', 'Sombre'], ['light', 'Clair']].map(([v, l]) => `<button data-a="r-theme" data-v="${v}" aria-pressed="${theme === v}">${l}</button>`).join('')}</div></section>
+  </div>`;
+}
+function appliquerTheme() { const t = lireReglages().theme || ''; if (t) document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme'); }
+
+async function connecterSupabase(silencieux) {
+  const R = UI.R;
+  if (!Supa.pret()) throw new ErreurForge('Bibliothèque Supabase indisponible.');
+  ecrireReglages({ url: R.url, cle: R.cle, email: R.email });
+  Supa.creer(R.url.trim(), R.cle.trim());
+  if (!silencieux) await Supa.connecter(R.email.trim(), R.mdp);
+  else if (!(await Supa.session())) return false;
+  if (!(await Supa.verifierEditeur())) {
+    R.msg = { type: 'afaire', html: `Connecté, mais ce compte n’est pas déclaré éditeur. Dans l’éditeur SQL de Supabase, exécute :<div class="mono-bloc">insert into editeurs (user_id, email)\nselect id, email from auth.users where email = '${esc(DEPOT.utilisateur.email)}';</div>Puis reconnecte-toi.` };
+    return false;
+  }
+  await chargerSupabase();
+  return true;
+}
+async function chargerSupabase() {
+  BASE = await occuper('Chargement des registres…', () => Supa.charger((i, n) => { UI.occupe = `Chargement des registres… ${i} / ${n}`; rendreVoile(); }));
+  DEPOT.pret = true; UI.R.mdp = ''; UI.R.msg = null; UI.J.entrees = null;
+  ajusterSpheres(F().h);
+}
+async function changerSource(src) {
+  ecrireReglages({ source: src });
+  DEPOT.mode = src; DEPOT.pret = false;
+  if (src === 'local') { BASE = Local.charger(); DEPOT.pret = true; }
+  else {
+    BASE = new Base();
+    if (Supa.pret() && UI.R.url && UI.R.cle) { try { await connecterSupabase(true); } catch (e) { UI.R.msg = { type: 'err', html: esc(messagesErreur(e).join(' ')) }; } }
+  }
+  UI.L.E = null; UI.L.cle = null; UI.X.sim = null;
+  ajusterSpheres(F().h);
+}
+
+/* ═════════════ Données d’exemple (base locale) ═════════════ */
+async function ajouterExemples() {
+  const B = BASE, D = 'Exemple.';
+  const assure = async (t, init) => { const k = cleDe(t, init); if (!vide(init.id) && B.get(t, k)) return k; return Ecrire.ligne(t, nouvelleEdition(t, { description_fr: D, ...init })); };
+  for (const [id, n, en, c] of [['grec', 'Grec', 'Greek', '#D9C9A0'], ['nordique', 'Nordique', 'Norse', '#8FB8E0']]) await assure('pantheons', { id, nom_fr: n, nom_en: en, couleur: c });
+  const sph = [['foudre', 'Foudre', 'Lightning', '#E8D35A'], ['ciel', 'Ciel', 'Sky', '#7FB3E8'], ['guerre', 'Guerre', 'War', '#D9634F'], ['sagesse', 'Sagesse', 'Wisdom', '#B9A3E3'],
+    ['forge', 'Forge', 'Forge', '#E08A3C'], ['mer', 'Mer', 'Sea', '#3FB6A8'], ['givre', 'Givre', 'Frost', '#BFE3F2'], ['runes', 'Runes', 'Runes', '#9C8BD0']];
+  for (const [id, n, en, c] of sph) await assure('spheres', { id, nom_fr: n, nom_en: en, couleur: c });
+  const ents = [['Zeus', 'Zeus', 'M', 'aucun', false, 'aucun', 'grec', 'dieu', ['foudre', 'ciel']], ['Athéna', 'Athena', 'F', 'aucun', true, 'aucun', 'grec', 'dieu', ['sagesse', 'guerre']],
+    ['Héphaïstos', 'Hephaestus', 'M', 'aucun', true, 'aucun', 'grec', 'dieu', ['forge', 'foudre']], ['Poséidon', 'Poseidon', 'M', 'aucun', false, 'aucun', 'grec', 'dieu', ['mer', 'ciel']],
+    ['Thor', 'Thor', 'M', 'aucun', false, 'aucun', 'nordique', 'dieu', ['foudre', 'guerre']], ['Odin', 'Odin', 'M', 'aucun', true, 'aucun', 'nordique', 'dieu', ['runes', 'sagesse']],
+    ['Ymir', 'Ymir', 'M', 'aucun', true, 'aucun', 'nordique', 'titan', ['givre', 'guerre']]];
+  for (const [nom_fr, nom_en, genre, determinant_fr, elision_fr, article_en, pantheon_id, type_id, spheres] of ents)
+    if (!B.rows('entites').some(e => e.nom_fr === nom_fr && e.pantheon_id === pantheon_id)) await assure('entites', { nom_fr, nom_en, genre, determinant_fr, elision_fr, article_en, pantheon_id, type_id, spheres });
+  await assure('origines', { id: 'grecque', nom_fr: 'Grecque', nom_en: 'Greek', pantheons: ['grec'] });
+  await assure('origines', { id: 'nordique', nom_fr: 'Nordique', nom_en: 'Norse', pantheons: ['nordique'] });
+  const noms = [['Kallias', 'grecque', 'M'], ['Thaléia', 'grecque', 'F'], ['Néréa', 'grecque', 'F'], ['Démétrios', 'grecque', 'M'], ['Sigrun', 'nordique', 'F'], ['Hrafn', 'nordique', 'M'],
+    ['Eira', 'nordique', 'F'], ['Bjarki', 'nordique', 'M'], ['Sam', 'commune', 'E'], ['Léa', 'commune', 'F'], ['Malo', 'commune', 'M']];
+  for (const [nom, origine_id, genre] of noms) if (!B.rows('noms').some(n => n.nom === nom && n.origine_id === origine_id)) await Ecrire.ligne('noms', nouvelleEdition('noms', { nom, origine_id, genre }));
+  const ref = { pv: 100, atk: 10, vitesse: 1, critique: 5, degats_critiques: 1.5, recharge: 0, energie: 0, menace: 1 };
+  for (const [id, v] of Object.entries(ref)) { const s = B.get('stats', id); if (s && vide(s.valeur_ref)) await Ecrire.ligne('stats', { ...versEdition(B, 'stats', s), valeur_ref: v }, id); }
+  const voc = [['guerrier', 'Guerrier', 'Warrior', { pv: 1.1, atk: 1.4, critique: 1.2, menace: 1 }], ['gardien', 'Gardien', 'Guardian', { pv: 1.6, atk: 0.7, menace: 2 }],
+    ['sage', 'Sage', 'Sage', { pv: 0.8, atk: 1.3, energie: 1.5 }], ['guerisseur', 'Guérisseur', 'Healer', { pv: 0.9, atk: 0.8, recharge: 1.4 }]];
+  for (const [id, n, en, profil] of voc) await assure('vocations', { id, nom_fr: n, nom_en: en, profil });
+  const pouv = { foudre: ['Peau électrique', 'Éclair', 'Arc voltaïque', 'Colère céleste'], ciel: ['Vent porteur', 'Rafale', 'Nuée', 'Tempête'], guerre: ['Soif de bataille', 'Charge', 'Cri de guerre', 'Carnage'],
+    sagesse: ['Prescience', 'Stratagème', 'Parole d’autorité', 'Plan parfait'], forge: ['Peau de bronze', 'Marteau', 'Étincelles', 'Coulée ardente'], mer: ['Marée montante', 'Vague', 'Tourbillon', 'Raz-de-marée'],
+    givre: ['Cœur de glace', 'Gel', 'Pic de glace', 'Hiver sans fin'], runes: ['Rune de garde', 'Rune de feu', 'Rune de lien', 'Chant des runes'] };
+  for (const [s, [pa, p1, p2, ul]] of Object.entries(pouv)) {
+    if (B.rows('pouvoirs').some(p => p.sphere_id === s && p.description_fr === D)) continue;
+    await Ecrire.ligne('pouvoirs', nouvelleEdition('pouvoirs', { nom_fr: pa, emplacement: 'passif', sphere_id: s, declencheur_id: 'permanent', description_fr: D, texte_modele_fr: 'Exemple de passif.' }));
+    await Ecrire.ligne('pouvoirs', nouvelleEdition('pouvoirs', { nom_fr: p1, emplacement: 'pouvoir', sphere_id: s, recharge_s: 6, description_fr: D, texte_modele_fr: 'Exemple de pouvoir.' }));
+    await Ecrire.ligne('pouvoirs', nouvelleEdition('pouvoirs', { nom_fr: p2, emplacement: 'pouvoir', sphere_id: s, recharge_s: 9, description_fr: D, texte_modele_fr: 'Exemple de pouvoir.' }));
+    await Ecrire.ligne('pouvoirs', nouvelleEdition('pouvoirs', { nom_fr: ul, emplacement: 'ultime', sphere_id: s, energie_requise: 100, description_fr: D, texte_modele_fr: 'Exemple d’ultime.' }));
+  }
+}
+
+/* ═════════════ Rendu général ═════════════ */
+const VUES = { forge: vueForge, heritiers: vueHeritiers, listes: vueListes, echanges: vueEchanges, controles: vueControles, journal: vueJournal, reglages: vueReglages };
+const ONGLETS = [['forge', 'Forge'], ['heritiers', 'Héritiers'], ['listes', 'Listes'], ['echanges', 'Échanges'], ['controles', 'Contrôles'], ['journal', 'Journal'], ['reglages', 'Réglages']];
+function rendreEntete() {
+  const sup = DEPOT.mode === 'supabase';
+  const etat = sup ? (DEPOT.pret ? 'connecte' : 'deconnecte') : 'local';
+  const lib = sup ? (DEPOT.pret ? `Supabase · ${DEPOT.utilisateur ? DEPOT.utilisateur.email : ''}` : 'Supabase · non connecté') : 'Base locale';
+  $('#onglets').innerHTML = ONGLETS.map(([k, l]) => `<button data-a="aller" data-v="${k}" aria-current="${UI.vue === k ? 'page' : 'false'}">${l}${k === 'heritiers' ? `<span class="compte">${BASE.rows('heritiers').length}</span>` : ''}</button>`).join('');
+  $('#source').className = 'source ' + etat;
+  $('#source').innerHTML = `<i></i>${esc(lib)}`;
+}
+function rendre() {
+  const act = document.activeElement, focus = act && act.dataset ? act.dataset.focus : null;
+  const pos = act && typeof act.selectionStart === 'number' ? [act.selectionStart, act.selectionEnd] : null;
+  rendreEntete();
+  $('#vue').innerHTML = VUES[UI.vue]();
+  if (focus) {
+    const el = $(`[data-focus="${CSS.escape(focus)}"]`);
+    if (el) { el.focus({ preventScroll: true }); if (pos && typeof el.setSelectionRange === 'function') try { el.setSelectionRange(pos[0], pos[1]); } catch (e) { /* champ sans sélection */ } }
+  }
+  if (UI.vue === 'echanges') brancherDepot();
+}
+function brancherDepot() {
+  const d = $('#depot');
+  if (!d) return;
+  d.addEventListener('dragover', e => { e.preventDefault(); d.classList.add('survol'); });
+  d.addEventListener('dragleave', () => d.classList.remove('survol'));
+  d.addEventListener('drop', e => { e.preventDefault(); d.classList.remove('survol'); lireFichiers([...e.dataTransfer.files]); });
+}
+
+/* ═════════════ Actions ═════════════ */
+const A = {
+  aller: el => { UI.vue = el.dataset.v; if (UI.vue === 'journal') UI.J.entrees = null; rendre(); window.scrollTo(0, 0); },
+  // Forge
+  'f-elev': el => { F().h.elevation_depart_id = el.dataset.v; rendre(); },
+  'f-verrou': el => { const k = el.dataset.k; F().verrous[k] = !F().verrous[k]; rendre(); },
+  'f-de': el => { generer([el.dataset.k]); rendre(); },
+  'f-generer': () => { generer(null); F().erreurs = null; rendre(); },
+  'f-nouveau': () => { forgeNeuve(); rendre(); },
+  'f-nouveau-aller': () => { if (!forgeModifiee()) forgeNeuve(); UI.vue = 'forge'; rendre(); },
+  'f-dupliquer': () => { const id = F().h.id; ouvrirHeritier(id, true); notifier(`Copie de ${id} : choisis un autre nom avant d’enregistrer.`, 'info'); rendre(); },
+  'f-enregistrer': () => enregistrerForge(),
+  'f-auto': () => { appliquerAuto(F().h); rendre(); },
+  'f-genre': el => { F().genre = el.dataset.v; rendre(); },
+  'f-nom-ajout': () => { const f = F(); const ent = BASE.get('entites', f.h.entite_id); f.ajoutNom = f.ajoutNom ? null : { nom: '', origine_id: ent ? (BASE.trie('origines').find(o => !o.universelle && origineAcceptee(BASE, o.id, ent.pantheon_id)) || {}).id || '' : '', genre: f.genre || '' }; rendre(); },
+  'f-nom-creer': async () => {
+    const f = F(), a = f.ajoutNom;
+    try { const id = await Ecrire.ligne('noms', nouvelleEdition('noms', { nom: (a.nom || '').trim(), origine_id: a.origine_id || null, genre: a.genre || null })); f.h.nom_id = id; f.ajoutNom = null; notifier(`Nom ${libId(BASE, 'noms', id)} ajouté.`); }
+    catch (e) { notifier(messagesErreur(e).join(' '), 'erreur'); }
+    rendre();
+  },
+  // Héritiers
+  'h-ouvrir': el => { if (forgeModifiee() && F().h.id !== el.dataset.id) { UI.HX.ouvrir = { id: el.dataset.id }; rendre(); return; } ouvrirHeritier(el.dataset.id); rendre(); },
+  'h-dupliquer': el => { if (forgeModifiee()) { UI.HX.ouvrir = { id: el.dataset.id, copier: true }; rendre(); return; } ouvrirHeritier(el.dataset.id, true); rendre(); },
+  'h-ouvrir-ok': () => { const o = UI.HX.ouvrir; UI.HX.ouvrir = null; ouvrirHeritier(o.id, o.copier); rendre(); },
+  'h-ouvrir-non': () => { UI.HX.ouvrir = null; rendre(); },
+  'h-suppr': el => { UI.HX.confirm = el.dataset.id; rendre(); },
+  'h-suppr-non': () => { UI.HX.confirm = null; rendre(); },
+  'h-suppr-ok': async el => {
+    const id = el.dataset.id;
+    try { await occuper('Suppression…', () => Ecrire.supprimer('heritiers', id)); notifier(`${id} supprimé.`); if (F().h.id === id) forgeNeuve(); }
+    catch (e) { notifier(messagesErreur(e).join(' '), 'erreur'); }
+    UI.HX.confirm = null; rendre();
+  },
+  'go-heritier': el => { if (forgeModifiee() && F().h.id !== el.dataset.id) { UI.vue = 'heritiers'; UI.HX.ouvrir = { id: el.dataset.id }; rendre(); return; } ouvrirHeritier(el.dataset.id); rendre(); window.scrollTo(0, 0); },
+  'go-ligne': el => { UI.L.retour = null; ouvrirLigne(el.dataset.t, el.dataset.k); rendre(); window.scrollTo(0, 0); },
+  // Listes
+  'l-table': el => { UI.L.table = el.dataset.t; UI.L.E = null; UI.L.cle = null; UI.L.q = ''; UI.L.retour = null; UI.vue = 'listes'; rendre(); },
+  'l-ligne': el => { UI.L.retour = null; ouvrirLigne(UI.L.table, el.dataset.k); rendre(); },
+  'l-nouveau': () => { UI.L.retour = null; ouvrirLigne(UI.L.table, null); rendre(); },
+  'l-annuler': () => { UI.L.E = null; UI.L.cle = null; UI.L.retour = null; rendre(); },
+  'l-liste': el => { const E = UI.L.E, k = el.dataset.k, v = el.dataset.v; E[k] = (E[k] || []).includes(v) ? E[k].filter(x => x !== v) : [...(E[k] || []), v]; rendre(); },
+  'l-enfant': el => { const L = UI.L; L.retour = { t: L.table, cle: L.cle }; ouvrirLigne(el.dataset.t, el.dataset.k); UI.L.retour = L.retour; rendre(); },
+  'l-enfant-nouveau': el => {
+    const L = UI.L, t = el.dataset.t, retour = { t: L.table, cle: L.cle }, init = {};
+    if (el.dataset.poly) { const [col, type] = el.dataset.poly.split(':'); init[col] = { type, id: L.cle }; }
+    else init[el.dataset.fk] = L.cle;
+    if (t === 'effets') init.ordre = Math.max(0, ...BASE.rows('effets').filter(e => e.pouvoir_id === L.cle).map(e => e.ordre)) + 1;
+    ouvrirLigne(t, null, init); UI.L.retour = retour; rendre();
+  },
+  'l-retour': () => { const r = UI.L.retour; UI.L.retour = null; ouvrirLigne(r.t, r.cle); rendre(); },
+  'l-enregistrer': async () => {
+    const L = UI.L;
+    try {
+      const k = await occuper('Enregistrement…', () => Ecrire.ligne(L.table, L.E, L.cle));
+      const retour = L.retour;
+      ouvrirLigne(L.table, k); L.retour = retour;
+      notifier('Enregistré.');
+    } catch (e) { L.erreurs = messagesErreur(e); }
+    rendre();
+  },
+  'l-suppr': () => { UI.L.confirm = true; rendre(); },
+  'l-suppr-non': () => { UI.L.confirm = false; rendre(); },
+  'l-suppr-ok': async () => {
+    const L = UI.L;
+    try { await occuper('Suppression…', () => Ecrire.supprimer(L.table, L.cle)); notifier('Supprimé.'); const r = L.retour; L.E = null; L.cle = null; L.retour = null; if (r) ouvrirLigne(r.t, r.cle); }
+    catch (e) { L.erreurs = messagesErreur(e); L.confirm = false; }
+    rendre();
+  },
+  // Échanges
+  'x-retirer': el => { UI.X.lots.splice(+el.dataset.i, 1); UI.X.sim = null; rendre(); },
+  'x-vider': () => { UI.X.lots = []; UI.X.sim = null; UI.X.progression = ''; rendre(); },
+  'x-analyser': () => { UI.X.sim = simulerImport(UI.X.lots); UI.X.progression = ''; rendre(); },
+  'x-appliquer': async () => {
+    const X = UI.X;
+    try {
+      await occuper('Import…', () => appliquerImport(X.sim, (i, n) => { UI.occupe = `Import… ${i} / ${n}`; rendreVoile(); }));
+      if (DEPOT.mode === 'supabase') await chargerSupabase();
+      const n = X.sim.rapport.reduce((a, r) => a + r.crees + r.maj, 0);
+      X.lots = []; X.sim = null; X.progression = '';
+      notifier(`Import terminé : ${n} élément${n > 1 ? 's' : ''} écrit${n > 1 ? 's' : ''}.`);
+    } catch (e) {
+      X.progression = 'Import interrompu : ' + messagesErreur(e).join(' ');
+      if (DEPOT.mode === 'supabase') { try { await chargerSupabase(); } catch (e2) { /* rechargement impossible */ } }
+      notifier('Import interrompu.', 'erreur');
+    }
+    rendre();
+  },
+  'x-export': el => { const t = el.dataset.t; telecharger(`${t}.tsv`, exporterTable(BASE, t)); },
+  'x-export-tout': async () => {
+    if (!window.JSZip) { for (const t of TABLES_ECHANGE) telecharger(`${t}.tsv`, exporterTable(BASE, t)); notifier('Archive indisponible : un fichier par registre a été téléchargé.', 'info'); return; }
+    const z = new JSZip();
+    for (const t of TABLES_ECHANGE) z.file(`${t}.tsv`, exporterTable(BASE, t));
+    const date = new Date().toISOString().slice(0, 10);
+    telecharger(`registres-ichor-${date}.zip`, await z.generateAsync({ type: 'blob' }));
+  },
+  'x-build': () => {
+    const X = UI.X, v = parseInt(X.version, 10);
+    if (!Number.isInteger(v) || v < 1) { X.build = ['La version doit être un nombre entier positif.']; rendre(); return; }
+    const b = preparerBuild(BASE, v);
+    if (b.erreurs.length) { X.build = ['Build refusé : des Héritiers en jeu ne respectent pas les règles.', ...b.erreurs]; rendre(); return; }
+    telecharger(`ichor-donnees-v${v}.json`, JSON.stringify(b.donnees, null, 2), 'application/json');
+    ecrireReglages({ version_build: v });
+    X.build = null; X.version = v + 1;
+    notifier(`Build v${v} généré : ${b.nb} Héritier${b.nb > 1 ? 's' : ''}.`);
+    rendre();
+  },
+  // Journal
+  'j-actualiser': () => { UI.J.entrees = null; UI.J.erreur = null; rendre(); },
+  // Réglages
+  'r-montrer': () => { UI.R.montrerCle = !UI.R.montrerCle; rendre(); },
+  'r-connecter': async () => {
+    const R = UI.R; R.msg = null;
+    try { if (await occuper('Connexion…', () => connecterSupabase(false))) notifier('Connecté à Supabase.'); }
+    catch (e) { R.msg = { type: 'err', html: esc(messagesErreur(e).join(' ')) }; DEPOT.pret = false; }
+    rendre();
+  },
+  'r-deconnecter': async () => { await Supa.deconnecter(); DEPOT.pret = false; BASE = new Base(); rendre(); },
+  'r-recharger': async () => { try { await chargerSupabase(); notifier('Données rechargées.'); } catch (e) { notifier(messagesErreur(e).join(' '), 'erreur'); } rendre(); },
+  'r-copier-local': () => {
+    try {
+      localStorage.setItem(LOCAL_CLE, JSON.stringify({ v: 1, D: BASE.D, compteurs: {}, journal: [] }));
+      notifier('Copie locale enregistrée. Elle sera utilisée si tu bascules sur la base locale.');
+    } catch (e) { notifier('Copie impossible : ' + e.message, 'erreur'); }
+  },
+  'r-exemple': async () => {
+    try { await occuper('Ajout des exemples…', () => ajouterExemples()); notifier('Données d’exemple ajoutées.'); }
+    catch (e) { notifier(messagesErreur(e).join(' '), 'erreur'); }
+    rendre();
+  },
+  'r-vider': () => { UI.R.confirmVider = true; rendre(); },
+  'r-vider-non': () => { UI.R.confirmVider = false; rendre(); },
+  'r-vider-ok': () => {
+    try { localStorage.removeItem(LOCAL_CLE); } catch (e) { /* stockage indisponible */ }
+    BASE = Local.charger(); Local.persister(); UI.R.confirmVider = false; forgeNeuve(); notifier('Base locale remise à zéro.'); rendre();
+  },
+  'r-theme': el => { ecrireReglages({ theme: el.dataset.v }); appliquerTheme(); rendre(); },
+};
+const CH = {
+  'f-filtre': el => { const f = F(); f.filtres[el.dataset.k] = el.value; const e = BASE.get('entites', f.h.entite_id); if (e && ((f.filtres.pantheon && e.pantheon_id !== f.filtres.pantheon) || (f.filtres.type && e.type_id !== f.filtres.type))) f.h.entite_id = null; rendre(); },
+  'f-champ': el => { F().h[el.dataset.k] = el.value || null; if (el.dataset.k === 'statut') F().h.statut = el.value; F().erreurs = null; rendre(); },
+  'f-sphere': el => { F().h.spheres[+el.dataset.i].sphere_id = el.value || null; rendre(); },
+  'f-contrainte': el => { F().contraintes[+el.dataset.i] = el.checked; rendre(); },
+  'f-etalon': el => { F().h.etalon = el.checked; rafraichirCote(); },
+  'f-an': el => { F().ajoutNom[el.dataset.k] = el.value; },
+  'h-filtre': el => { UI.HX[el.dataset.k] = el.value; rendre(); },
+  'l-champ': el => { UI.L.E[el.dataset.k] = el.value === '' ? null : el.value; rendre(); },
+  'l-bool': el => { UI.L.E[el.dataset.k] = el.checked; },
+  'l-poly-type': el => { UI.L.E[el.dataset.k] = { type: el.value, id: '' }; rendre(); },
+  'l-poly-id': el => { UI.L.E[el.dataset.k] = { ...UI.L.E[el.dataset.k], id: el.value }; },
+  'x-fichiers': el => { lireFichiers([...el.files]); el.value = ''; },
+  'x-table': el => { UI.X.lots[+el.dataset.i].table = el.value; UI.X.sim = null; rendre(); },
+  'r-source': el => { occuper('Changement de source…', () => changerSource(el.value)).then(rendre); },
+};
+const IN = {
+  'f-stat': el => { const v = lireNombre(el.value); if (v === null) delete F().h.stats[el.dataset.k]; else F().h.stats[el.dataset.k] = v; rafraichirCote(); },
+  'f-notes': el => { F().h.notes = el.value || null; rafraichirCote(); },
+  'f-an': el => { F().ajoutNom[el.dataset.k] = el.value; },
+  'h-q': el => { UI.HX.q = el.value; rendre(); },
+  'l-q': el => { UI.L.q = el.value; rendre(); },
+  'l-champ': el => { UI.L.E[el.dataset.k] = el.value === '' ? null : el.value; const a = $('#l-apercu'); if (a && META[UI.L.table].apercu) a.textContent = META[UI.L.table].apercu(UI.L.E); },
+  'l-nombre': el => { UI.L.E[el.dataset.k] = lireNombre(el.value); },
+  'l-pivot': el => { const E = UI.L.E, k = el.dataset.k; E[k] = { ...(E[k] || {}) }; const v = lireNombre(el.value); if (v === null) delete E[k][el.dataset.v]; else E[k][el.dataset.v] = v; },
+  'x-version': el => { UI.X.version = el.value; },
+  'r-champ': el => { UI.R[el.dataset.k] = el.value; },
+};
+document.addEventListener('click', ev => {
+  const el = ev.target.closest('[data-a]');
+  if (!el || el.disabled) return;
+  const f = A[el.dataset.a];
+  if (f) { ev.preventDefault(); Promise.resolve(f(el, ev)).finally(() => { if (UI.vue === 'forge') sauverEdition(); }); }
+});
+document.addEventListener('change', ev => { const el = ev.target.closest('[data-c]'); if (el && CH[el.dataset.c]) { CH[el.dataset.c](el); if (UI.vue === 'forge') sauverEdition(); } });
+document.addEventListener('input', ev => { const el = ev.target.closest('[data-i]'); if (el && IN[el.dataset.i]) { IN[el.dataset.i](el); if (UI.vue === 'forge') sauverEdition(); } });
+window.addEventListener('beforeunload', ev => { if (UI.vue === 'forge' && forgeModifiee() && F().h.id) { ev.preventDefault(); ev.returnValue = ''; } });
+
+/* ═════════════ Démarrage ═════════════ */
+async function demarrer() {
+  appliquerTheme();
+  const r = lireReglages();
+  Object.assign(UI.R, { url: r.url || UI.R.url, cle: r.cle || '', email: r.email || '' });
+  DEPOT.mode = r.source === 'supabase' ? 'supabase' : 'local';
+  if (DEPOT.mode === 'local') { BASE = Local.charger(); DEPOT.pret = true; try { Local.persister(); } catch (e) { notifier(e.message, 'erreur'); } }
+  restaurerEdition();
+  rendre();
+  if (DEPOT.mode === 'supabase') {
+    if (Supa.pret() && UI.R.cle) {
+      try { await connecterSupabase(true); } catch (e) { UI.R.msg = { type: 'err', html: esc(messagesErreur(e).join(' ')) }; }
+    }
+    if (!DEPOT.pret) UI.vue = 'reglages';
+    ajusterSpheres(F().h);
+    rendre();
+  }
+}
+demarrer();
+
+</script>
+</body>
+</html>
